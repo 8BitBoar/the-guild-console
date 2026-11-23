@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070b1a">
+<title>The Guild Console</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070b1a'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%23d9b25a'/%3E%3Cpath d='M22 32c-6-1-12-5-16-11 5 2 10 3 15 3-4-1-8-3-11-6 4 1 9 2 13 2' fill='none' stroke='%23d9b25a' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M42 32c6-1 12-5 16-11-5 2-10 3-15 3 4-1 8-3 11-6-4 1-9 2-13 2' fill='none' stroke='%23d9b25a' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#070b1a; --bg2:#0b1128; --panel:rgba(13,19,42,.86); --panel2:rgba(20,28,58,.9);
+  --line:rgba(217,178,90,.22); --line2:rgba(217,178,90,.45);
+  --gold:#d9b25a; --gold2:#f1d48c; --text:#ebe6d6; --muted:#97a0b6; --dim:#6b7390;
+  --teal:#45b8a9; --amber:#e8a33c; --red:#e2645c; --violet:#8f7ee0; --navy:#253F79;
+  --r:12px; --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 var(--sans);-webkit-text-size-adjust:100%}
+body.noscroll{overflow:hidden}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#app{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 12px 40px}
+a{color:var(--gold2)}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:.01em;margin:0}
+h2{font-size:1.25rem;color:var(--gold2)}
+h3{font-size:1.02rem;color:var(--gold)}
+.mono{font-family:var(--mono)}
+.muted{color:var(--muted)} .dim{color:var(--dim)} .small{font-size:.84rem}
+.gold{color:var(--gold2)} .warn{color:var(--amber)} .bad{color:var(--red)} .good{color:var(--teal)}
+
+/* ---------- top bar ---------- */
+#top{position:sticky;top:0;z-index:20;margin:0 -12px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;
+  background:linear-gradient(180deg,rgba(7,11,26,.97),rgba(7,11,26,.9));border-bottom:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:8px;min-width:0}
+.brand svg{width:34px;height:22px;flex:none}
+.brand b{font-family:var(--serif);font-size:1.05rem;color:var(--gold2);white-space:nowrap}
+.sync{width:9px;height:9px;border-radius:50%;background:var(--dim);flex:none;border:0;padding:0;cursor:pointer}
+.sync.ok{background:var(--teal)} .sync.dirty{background:var(--amber)} .sync.busy{background:var(--gold2);animation:pulse 1s infinite} .sync.err{background:var(--red)}
+@keyframes pulse{50%{opacity:.35}}
+.clock{margin-left:auto;text-align:right;line-height:1.15}
+.clock .d{font-size:.8rem;color:var(--muted)}
+.clock .t{font-family:var(--mono);font-size:1.15rem;color:var(--text)}
+.clock.late .t{color:var(--amber)} .clock.over .t{color:var(--red)}
+.clock .lw{font-size:.7rem;color:var(--amber)}
+.stats{margin-top:7px;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border:1px solid var(--line);border-radius:999px;background:var(--panel);font-size:.8rem;white-space:nowrap}
+.chip b{font-family:var(--mono);font-weight:600;color:var(--gold2)}
+.chip.stage{border-color:var(--line2);color:var(--gold2)}
+.lvl{display:flex;align-items:center;gap:6px;flex:1 1 150px;min-width:150px}
+.bar{position:relative;height:7px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;flex:1}
+.bar>i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:99px}
+.bar.teal>i{background:linear-gradient(90deg,#2d8e83,var(--teal))}
+.bar.violet>i{background:linear-gradient(90deg,#5e50b0,var(--violet))}
+.iconbtn{position:relative;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:3px 9px;font-size:.8rem;cursor:pointer}
+.iconbtn .n{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;border-radius:9px;background:var(--red);color:#fff;font-size:.65rem;line-height:16px;text-align:center;padding:0 4px}
+
+/* ---------- tabs ---------- */
+#tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:8px -12px 0;padding:0 12px 2px}
+#tabs::-webkit-scrollbar{display:none}
+#tabs button{flex:none;background:transparent;border:1px solid transparent;color:var(--muted);padding:6px 11px;border-radius:999px;font-size:.86rem;cursor:pointer}
+#tabs button.on{color:var(--bg);background:var(--gold);font-weight:600}
+#tabs button:not(.on):hover{border-color:var(--line)}
+
+/* ---------- panels ---------- */
+#view{padding-top:12px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;position:relative}
+.panel+.panel{margin-top:12px}
+.grid .panel+.panel{margin-top:0}
+.panel>h2,.panel>h3{margin-bottom:8px}
+.hd{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.hd h2,.hd h3{margin:0}
+.soon{border-style:dashed;border-color:rgba(217,178,90,.18);background:rgba(13,19,42,.55)}
+.soon .tag{font-family:var(--mono);font-size:.7rem;color:var(--gold);letter-spacing:.06em;text-transform:uppercase}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:.9rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--mono);text-align:right}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:left;padding:5px 6px;border-bottom:1px solid rgba(217,178,90,.1);vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+td.n,th.n{text-align:right;font-family:var(--mono)}
+.empty{color:var(--muted);font-style:italic;padding:6px 0}
+ul.plain{margin:0;padding-left:18px} ul.plain li{margin:2px 0}
+
+/* ---------- controls ---------- */
+button.btn,.btn{appearance:none;background:var(--panel2);border:1px solid var(--line2);color:var(--text);border-radius:9px;padding:8px 13px;font:inherit;font-size:.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.btn:hover{border-color:var(--gold)}
+.btn.gold{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1405;border-color:var(--gold2);font-weight:600}
+.btn.danger{border-color:rgba(226,100,92,.6);color:#ffb3ad}
+.btn.small{padding:5px 9px;font-size:.8rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+label.f{display:block;font-size:.82rem;color:var(--muted);margin:8px 0 3px}
+input,select,textarea{width:100%;background:rgba(5,8,20,.75);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 10px;font:inherit;font-size:16px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+textarea{min-height:90px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#endDay{white-space:nowrap}
+
+/* ---------- cards ---------- */
+.cardrow{display:flex;gap:10px;flex-wrap:wrap}
+.gcard{width:150px;min-height:200px;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;
+  background:linear-gradient(160deg,#141c3c,#0a0f24);border:1px solid var(--line2);position:relative;overflow:hidden}
+.gcard::after{content:"";position:absolute;inset:4px;border:1px solid rgba(217,178,90,.15);border-radius:9px;pointer-events:none}
+.gcard .rar{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase}
+.gcard .nm{font-family:var(--serif);font-size:.98rem;color:var(--gold2);line-height:1.2}
+.gcard .meta{font-size:.74rem;color:var(--muted);margin-top:auto}
+.gcard .ct{position:absolute;top:8px;right:9px;font-family:var(--mono);font-size:.75rem;color:var(--gold2)}
+.r-C{color:#b8bfcf} .r-U{color:#62c7b8} .r-R{color:#e3b955} .r-M{color:#e07a5f}
+.gcard.core{border-color:var(--gold2);box-shadow:0 0 18px rgba(217,178,90,.15) inset}
+
+/* ---------- foundation ---------- */
+.track{display:flex;flex-direction:column;gap:4px}
+.step{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center;padding:6px 8px;border-radius:8px;border:1px solid rgba(217,178,90,.1)}
+.step .k{font-family:var(--mono);color:var(--dim);text-align:center}
+.step.un{border-color:var(--line2);background:rgba(217,178,90,.06)} .step.un .k{color:var(--gold2)}
+.step.live{border-color:rgba(69,184,169,.5)} .step.live .k{color:var(--teal)}
+.step .s{font-size:.76rem;color:var(--muted)}
+.pill{font-size:.7rem;font-family:var(--mono);padding:2px 7px;border-radius:99px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.on{color:var(--gold2);border-color:var(--line2)} .pill.live{color:var(--teal);border-color:rgba(69,184,169,.5)}
+
+/* ---------- journal ---------- */
+.jr{display:grid;grid-template-columns:70px 1fr;gap:2px 10px;font-size:.88rem}
+.jr .tm{font-family:var(--mono);color:var(--dim);font-size:.8rem;padding-top:1px}
+.jr .tx .c{font-size:.68rem;font-family:var(--mono);color:var(--gold);text-transform:uppercase;letter-spacing:.05em;margin-right:5px}
+.jday{font-family:var(--serif);color:var(--gold2);margin:12px 0 4px;grid-column:1/-1;border-bottom:1px solid var(--line);padding-bottom:2px}
+pre.md{white-space:pre-wrap;word-break:break-word;background:rgba(5,8,20,.75);border:1px solid var(--line);border-radius:10px;padding:12px;font:12.5px/1.5 var(--mono);max-height:60vh;overflow:auto;margin:0}
+
+/* ---------- gauge ---------- */
+.gauge{position:relative;height:16px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden;margin:8px 0 4px}
+.gauge i{position:absolute;top:0;bottom:0;left:0}
+.gauge .safe{background:rgba(69,184,169,.22);border-right:2px solid var(--teal)}
+.gauge .act{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.legend{display:flex;justify-content:space-between;font-size:.76rem;color:var(--muted);font-family:var(--mono)}
+
+/* ---------- modal / toast ---------- */
+#modal:empty{display:none}
+.mback{position:fixed;inset:0;z-index:50;background:rgba(3,5,12,.72);display:flex;align-items:flex-end;justify-content:center;padding:12px}
+@media(min-width:640px){.mback{align-items:center}}
+.mbox{width:100%;max-width:560px;max-height:86vh;overflow:auto;background:linear-gradient(180deg,#111938,#0a0f24);border:1px solid var(--line2);border-radius:16px;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.mbox .hd{position:sticky;top:-16px;background:#111938;margin:-16px -16px 10px;padding:14px 16px 8px;border-bottom:1px solid var(--line)}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(92vw,460px)}
+#toast div{background:#151d40;border:1px solid var(--line2);color:var(--text);padding:9px 14px;border-radius:10px;font-size:.88rem;box-shadow:0 6px 24px rgba(0,0,0,.4);animation:tin .2s ease-out}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+.note{border-left:3px solid var(--gold);padding:8px 10px;background:rgba(217,178,90,.06);border-radius:0 8px 8px 0;margin:6px 0}
+.note.read{border-left-color:var(--dim);opacity:.75}
+.note b{font-family:var(--serif);color:var(--gold2)}
+
+footer{text-align:center;margin-top:26px;font-size:.8rem;color:var(--dim)}
+footer button{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit}
+.hello{font-family:var(--mono);color:var(--gold2);letter-spacing:.04em}
+.first{max-width:520px;margin:26px auto 0;text-align:center}
+.first .seal{width:140px;height:90px;margin:4px auto 10px;display:block}
+@media(max-width:520px){.grid{grid-template-columns:1fr}.clock .t{font-size:1.05rem}.brand b{font-size:.98rem}}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div id="app">
+  <header id="top"></header>
+  <main id="view"></main>
+  <footer><span>The Guild Console · Akh Runtime · milestone 1</span> · <button id="creditsLink">Credits &amp; licenses</button></footer>
+</div>
+<div id="modal"></div>
+<div id="toast"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+"use strict";
+/* ================================================================
+   THE GUILD CONSOLE — Emerson's day-by-day sim for The Guild.
+   Canon rules: "Emerson & The Guild — Dump Doc".
+   Build order and End Day sequence: "The Guild Console — Build Spec".
+   ================================================================ */
+const BUILD={milestone:1,version:"0.1.0"};
+const DEFAULT_CARDS={"version":1,"notes":"Card catalog for The Guild Console. Rarity: C/U/R/M. 'defaults' lists values the dump doc didn't set. Core cards are granted by the Foundation track and never drop from packs. Add new cards anywhere in the list; ids must be unique.","cards":[{"id":"adventurer-registration","name":"Adventurer Registration","pack":"Core","rarity":"U","category":"System","core":true,"step":0,"unlocks":"Awakening scene","effect":{"type":"core","turnsOn":"Members can exist; HUD"}},{"id":"membership-and-subscriptions","name":"Membership and Subscriptions","pack":"Core","rarity":"U","category":"System","core":true,"step":1,"unlocks":"Registration deployed","effect":{"type":"core","turnsOn":"Subscriber sim, dues"}},{"id":"phoenix-downs","name":"Phoenix Downs","pack":"Core","rarity":"R","category":"System","core":true,"step":2,"unlocks":"Membership deployed or Concept Level 2","effect":{"type":"core","turnsOn":"Down sales"}},{"id":"quest-registry","name":"Quest Registry","pack":"Core","rarity":"U","category":"System","core":true,"step":3,"unlocks":"Concept Level 3","effect":{"type":"core","turnsOn":"Planes' quest sim, Registry fees (includes the basic Party Board)"}},{"id":"chat","name":"Chat","pack":"Core","rarity":"C","category":"System","core":true,"step":4,"unlocks":"Quest Registry deployed","effect":{"type":"core","turnsOn":"Flavor"}},{"id":"guild-shop","name":"Guild Shop","pack":"Core","rarity":"U","category":"System","core":true,"step":5,"unlocks":"Concept Level 4","effect":{"type":"core","turnsOn":"Shop sim"}},{"id":"safe-zones","name":"Safe Zones","pack":"Core","rarity":"R","category":"System","core":true,"step":6,"unlocks":"Phoenix Downs deployed + Concept Level 5","effect":{"type":"core","turnsOn":"Anchors become an attack vector"}},{"id":"waystones","name":"Waystones","pack":"Core","rarity":"R","category":"System","core":true,"step":7,"unlocks":"Concept Level 6","effect":{"type":"core","turnsOn":"Waystone trips, Waystone fees"}},{"id":"guild-inn-and-tavern","name":"Guild Inn and Tavern","pack":"Core","rarity":"M","category":"System","core":true,"step":8,"unlocks":"Safe Zones deployed","effect":{"type":"core","turnsOn":"Inn sim, Inn direct costs"}},{"id":"housing-plane","name":"Housing Plane","pack":"Core","rarity":"M","category":"System","core":true,"step":9,"unlocks":"GIT deployed + Concept Level 8","effect":{"type":"core","turnsOn":"Housing sim (Guild Commons)"}},{"id":"antivirus","name":"Antivirus","pack":"Core","rarity":"U","category":"System","core":true,"step":"special","unlocks":"First Virus detected","effect":{"type":"core","turnsOn":"Auto-quarantine, detection at 25%"}},{"id":"moar-servers","name":"MOAR SERVERS!!!","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"capacity","ranks":[50,250,2500,25000,1000000],"authority":[2,4,6,8,10]},"flavor":"The solution to insufficient infrastructure is obviously more infrastructure.","defaults":["rarity"]},{"id":"pest-control","name":"PEST CONTROL","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"bugThreshold","perRank":5},"defaults":["rarity"]},{"id":"remastered","name":"REMASTERED","pack":"Perk","rarity":"M","category":"Perk","repeatable":true,"effect":{"type":"versionBonusCap","perRank":0.02,"hoursPerRank":24},"flavor":"Same game. Better everything."},{"id":"ship-it","name":"SHIP IT!","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"devTime","tag":"Expansion","pct":0.1},"defaults":["rarity"]},{"id":"asset-reuse","name":"ASSET REUSE","pack":"Perk","rarity":"C","category":"Perk","repeatable":true,"effect":{"type":"devTime","category":"Item","pctPerRank":0.05},"defaults":["rarity"]},{"id":"inheritance","name":"INHERITANCE","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"devTime","category":"Class","pctPerRank":0.1},"defaults":["rarity"]},{"id":"quality-assurance","name":"QUALITY ASSURANCE","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"latentBugs","pctPerRank":0.1},"defaults":["rarity","effect"]},{"id":"word-gets-around","name":"WORD GETS AROUND","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"signupMult","perRank":1.1},"defaults":["rarity","effect"]},{"id":"transferable-skills","name":"TRANSFERABLE SKILLS","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"expertiseTransfer","share":0.5},"flavor":"You know, this looks familiar.","defaults":["rarity","effect"]},{"id":"moar-dakka","name":"MOAR DAKKA","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"purge","perRank":0.02,"maxRank":5,"flesh":[4,5,6,7,8]},"flavor":"If it's not working, you're not using enough gun.","defaults":["rarity"],"maxRank":5},{"id":"early-detection","name":"Early Detection","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"earlyDetect","perRank":5,"floor":10},"defaults":["rarity","name"]},{"id":"vaccine-shot","name":"Vaccine Shot","pack":"Perk","rarity":"C","category":"Perk","repeatable":false,"effect":{"type":"consumable","makes":"vaccine","hoursPerRun":2},"defaults":["rarity","hoursPerRun"],"consumable":true},{"id":"changed-graphite","name":"Changed Graphite","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Faster Krakoa regrowth"},"defaults":["rarity"]},{"id":"alt-tab","name":"ALT-TAB","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Snap back to her body instantly"},"defaults":["rarity"]},{"id":"picture-in-picture","name":"PICTURE-IN-PICTURE","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"See and hear around her body from inside"},"defaults":["rarity"]},{"id":"hard-link","name":"HARD LINK","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Bring her physical body into the Runtime"},"defaults":["rarity"]},{"id":"character-creator","name":"Character Creator","pack":"DevTools","rarity":"M","category":"DevTool","hours":80,"effect":{"type":"sleeves"}},{"id":"reboot","name":"REBOOT","pack":"DevTools","rarity":"R","category":"DevTool","hours":40,"effect":{"type":"reboot"},"defaults":["rarity","hours"]},{"id":"black-rose-dragon","name":"Black Rose Dragon","pack":"DevTools","rarity":"R","category":"DevTool","hours":7,"source":"Yu-Gi-Oh! Synchro monster, Level 7","effect":{"type":"ability"},"defaults":["rarity"]},{"id":"swords-of-revealing-light","name":"Swords of Revealing Light","pack":"DevTools","rarity":"R","category":"DevTool","hours":8,"source":"Yu-Gi-Oh! Spell","effect":{"type":"ability"},"defaults":["rarity"]},{"id":"hud-feature-immersive-mode","name":"HUD Feature: Immersive Mode","pack":"System","rarity":"U","category":"System","needs":["adventurer-registration"],"effect":{"type":"feature"}},{"id":"wardrobe","name":"Wardrobe","pack":"System","rarity":"U","category":"System","needs":["guild-shop"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"dye-studio","name":"Dye Studio","pack":"System","rarity":"C","category":"System","needs":["wardrobe"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"outfit-presets","name":"Outfit Presets","pack":"System","rarity":"C","category":"System","needs":["wardrobe"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"housing-feature-sea","name":"Housing Feature: Sea","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Sea","mythic":false}},{"id":"housing-feature-snowy-mountains","name":"Housing Feature: Snowy Mountains","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Snowy Mountains","mythic":false}},{"id":"housing-feature-desert","name":"Housing Feature: Desert","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Desert","mythic":false}},{"id":"housing-feature-viking","name":"Housing Feature: Viking","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Viking","mythic":false}},{"id":"housing-feature-lowcountry-bayou","name":"Housing Feature: Lowcountry Bayou","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Lowcountry Bayou","mythic":false}},{"id":"housing-feature-treetop-forest","name":"Housing Feature: Treetop Forest","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Treetop Forest","mythic":false}},{"id":"housing-feature-rolling-hills","name":"Housing Feature: Rolling Hills","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Rolling Hills","mythic":false}},{"id":"housing-feature-mushroom-grove","name":"Housing Feature: Mushroom Grove","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Mushroom Grove","mythic":false}},{"id":"housing-feature-agora-heights","name":"Housing Feature: Agora Heights","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Agora Heights","mythic":false}},{"id":"housing-feature-sky-islands","name":"Housing Feature: Sky Islands","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Sky Islands","mythic":true}},{"id":"housing-feature-coral-reef","name":"Housing Feature: Coral Reef","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Coral Reef","mythic":true}},{"id":"housing-feature-celestial","name":"Housing Feature: Celestial","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Celestial","mythic":true}},{"id":"shapeshifter-s-wardrobe","name":"Shapeshifter's Wardrobe","pack":"Item","rarity":"U","category":"Item","effect":{"type":"item"},"defaults":["rarity"],"flavor":"Stows an outfit in inventory on shifting and restores it on shifting back."},{"id":"class-fighter","name":"Fighter","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-guardian","name":"Guardian","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-aegis-knight","name":"Aegis Knight","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-guardian"],"base":"Fighter"},{"id":"class-duelist","name":"Duelist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-blademaster","name":"Blademaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-duelist"],"base":"Fighter"},{"id":"class-berserker","name":"Berserker","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-warbringer","name":"Warbringer","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-berserker"],"base":"Fighter"},{"id":"class-mage","name":"Mage","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-elementalist","name":"Elementalist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-tempest","name":"Tempest","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-elementalist"],"base":"Mage"},{"id":"class-arcanist","name":"Arcanist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-archmage","name":"Archmage","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-arcanist"],"base":"Mage"},{"id":"class-summoner","name":"Summoner","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-planebinder","name":"Planebinder","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-summoner"],"base":"Mage"},{"id":"class-ranger","name":"Ranger","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-warden","name":"Warden","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-sentinel","name":"Sentinel","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-warden"],"base":"Ranger"},{"id":"class-marksman","name":"Marksman","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-deadeye","name":"Deadeye","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-marksman"],"base":"Ranger"},{"id":"class-beastmaster","name":"Beastmaster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-wildheart","name":"Wildheart","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-beastmaster"],"base":"Ranger"},{"id":"class-rogue","name":"Rogue","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-assassin","name":"Assassin","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-nightblade","name":"Nightblade","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-assassin"],"base":"Rogue"},{"id":"class-trickster","name":"Trickster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-phantom","name":"Phantom","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-trickster"],"base":"Rogue"},{"id":"class-scout","name":"Scout","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-pathfinder","name":"Pathfinder","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-scout"],"base":"Rogue"},{"id":"class-healer","name":"Healer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-cleric","name":"Cleric","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-hierophant","name":"Hierophant","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cleric"],"base":"Healer"},{"id":"class-druid","name":"Druid","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-archdruid","name":"Archdruid","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-druid"],"base":"Healer"},{"id":"class-bard","name":"Bard","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-virtuoso","name":"Virtuoso","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-bard"],"base":"Healer"},{"id":"class-gunner","name":"Gunner","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-gunslinger","name":"Gunslinger","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-pistolero","name":"Pistolero","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-gunslinger"],"base":"Gunner"},{"id":"class-grenadier","name":"Grenadier","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-bombardier","name":"Bombardier","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-grenadier"],"base":"Gunner"},{"id":"class-gunmage","name":"Gunmage","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-spellslinger","name":"Spellslinger","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-gunmage"],"base":"Gunner"},{"id":"class-buccaneer","name":"Buccaneer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-corsair","name":"Corsair","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-dread-captain","name":"Dread Captain","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-corsair"],"base":"Buccaneer"},{"id":"class-cannoneer","name":"Cannoneer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-broadside","name":"Broadside","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cannoneer"],"base":"Buccaneer"},{"id":"class-sea-dog","name":"Sea Dog","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-reaver","name":"Reaver","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-sea-dog"],"base":"Buccaneer"},{"id":"class-gatherer","name":"Gatherer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Gathering"},{"id":"class-prospector","name":"Prospector","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-lodestar","name":"Lodestar","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-prospector"],"base":"Gatherer"},{"id":"class-herbalist","name":"Herbalist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-bloomkeeper","name":"Bloomkeeper","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-herbalist"],"base":"Gatherer"},{"id":"class-forager","name":"Forager","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-wayfarer","name":"Wayfarer","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-forager"],"base":"Gatherer"},{"id":"class-fisher","name":"Fisher","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Gathering"},{"id":"class-angler","name":"Angler","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-kingfisher","name":"Kingfisher","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-angler"],"base":"Fisher"},{"id":"class-deep-sea","name":"Deep-Sea","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-abyss-diver","name":"Abyss Diver","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-deep-sea"],"base":"Fisher"},{"id":"class-net-caster","name":"Net-Caster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-tidecaller","name":"Tidecaller","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-net-caster"],"base":"Fisher"},{"id":"class-artisan","name":"Artisan","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Crafting"},{"id":"class-artificer","name":"Artificer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-golemwright","name":"Golemwright","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-artificer"],"base":"Artisan"},{"id":"class-runecrafter","name":"Runecrafter","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-runemaster","name":"Runemaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-runecrafter"],"base":"Artisan"},{"id":"class-smith","name":"Smith","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-forgemaster","name":"Forgemaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-smith"],"base":"Artisan"},{"id":"class-provisioner","name":"Provisioner","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Crafting"},{"id":"class-cook","name":"Cook","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-gourmand","name":"Gourmand","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cook"],"base":"Provisioner"},{"id":"class-brewer","name":"Brewer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-brewmaster","name":"Brewmaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-brewer"],"base":"Provisioner"},{"id":"class-alchemist","name":"Alchemist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-transmuter","name":"Transmuter","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-alchemist"],"base":"Provisioner"},{"id":"class-spellblade","name":"Spellblade","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-duelist","class-elementalist"]},{"id":"class-paladin","name":"Paladin","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-guardian","class-cleric"]},{"id":"class-beastcaller","name":"Beastcaller","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-beastmaster","class-summoner"]},{"id":"class-shadowdancer","name":"Shadowdancer","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-trickster","class-bard"]},{"id":"class-sea-witch","name":"Sea Witch","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-deep-sea","class-druid"]},{"id":"class-trickshot","name":"Trickshot","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-trickster"]},{"id":"class-bounty-hunter","name":"Bounty Hunter","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-marksman"]},{"id":"class-exorcist","name":"Exorcist","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-cleric"]},{"id":"class-thunderlock","name":"Thunderlock","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunmage","class-elementalist"]},{"id":"class-pyrotechnist","name":"Pyrotechnist","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-grenadier","class-alchemist"]},{"id":"class-siegewright","name":"Siegewright","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-grenadier","class-artificer"]},{"id":"class-leviathan-raider","name":"Leviathan Raider","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-corsair","class-deep-sea"]}]};
+
+/* ---------------- small helpers ---------------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmtN=(n,d=0)=>Number(n||0).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtCr=n=>{const v=Math.round((n||0)*100)/100;return fmtN(v,Number.isInteger(v)?0:2)+" Cr"};
+const pct=n=>fmtN(n*100,Math.abs(n*100)%1?1:0)+"%";
+function toast(msg,ms=2600){const d=document.createElement("div");d.textContent=msg;$("#toast").appendChild(d);setTimeout(()=>d.remove(),ms)}
+function download(name,text,type="application/json"){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+async function copyText(t){try{await navigator.clipboard.writeText(t);toast("Copied")}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Copied")}catch(_){toast("Couldn't copy — use Download")}ta.remove()}}
+
+/* ---------------- dates and time ---------------- */
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const parseISO=iso=>{const [y,m,d]=iso.split("-").map(Number);return new Date(Date.UTC(y,m-1,d))};
+const isoOf=dt=>dt.toISOString().slice(0,10);
+const addDays=(iso,n)=>{const d=parseISO(iso);d.setUTCDate(d.getUTCDate()+n);return isoOf(d)};
+const fmtDate=iso=>parseISO(iso).toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric",timeZone:"UTC"});
+const fmtDateLong=iso=>parseISO(iso).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric",timeZone:"UTC"});
+const monthKey=iso=>iso.slice(0,7);
+const fmtMonth=key=>{const [y,m]=key.split("-").map(Number);return MONTHS[m-1]+" "+y};
+function fmtTime(min){min=Math.round(min);const day=Math.floor(min/1440);let m=min%1440;const h=Math.floor(m/60),mm=m%60;const ap=h<12?"AM":"PM";const h12=h%12||12;return `${h12}:${String(mm).padStart(2,"0")} ${ap}`+(day>0?` (+${day}d)`:"")}
+function fmtDur(min){min=Math.round(min);const h=Math.floor(min/60),m=min%60;return h&&m?`${h} hr ${m} min`:h?`${h} hr`+(h>1?"s":""):`${m} min`}
+
+/* ---------------- shared helpers (Build Spec §1) ---------------- */
+/** Days in the month of an ISO date. Monthly rates are always divided by this. */
+function daysInMonth(iso){const d=parseISO(iso);return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,0)).getUTCDate()}
+function hashStr(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const c=str.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (h2>>>0)*4294967296+(h1>>>0)}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296}}
+/** Seeded random stream for the current date and a roll label. Same save + date + label = same numbers, every time. */
+function rng(label,date){return mulberry32(hashStr(`${S.seed}|${date||S.date}|${label}`)%4294967296)}
+/** Bucket / percent-overflow roll: whole part guaranteed, fractional remainder rolled. */
+function rollCount(expected,r){if(!(expected>0))return 0;const w=Math.floor(expected),f=expected-w;return w+((r||Math.random)()<f?1:0)}
+/** Pick one key from a weight table; zero weights drop out and the rest renormalize. */
+function weightedPick(weights,r){const ks=Object.keys(weights).filter(k=>weights[k]>0);const tot=ks.reduce((s,k)=>s+weights[k],0);if(!tot)return null;let x=(r||Math.random)()*tot;for(const k of ks){x-=weights[k];if(x<0)return k}return ks[ks.length-1]}
+
+/* ================================================================
+   CATALOG
+   ================================================================ */
+let CAT={cards:[],byId:{}};
+function setCards(data){const list=(data&&Array.isArray(data.cards))?data.cards:[];CAT={cards:list,byId:Object.fromEntries(list.map(c=>[c.id,c])),source:data===DEFAULT_CARDS?"built-in":"repo"}}
+const RAR={C:"Common",U:"Uncommon",R:"Rare",M:"Mythic Rare"};
+const PACKS=["Perk","Class","Item","System","DevTools"];
+const PACKNAME={Perk:"Perk",Class:"Class",Item:"Item",System:"System",DevTools:"Dev Tools",Core:"Core"};
+const coreCards=()=>CAT.cards.filter(c=>c.core).sort((a,b)=>(a.step==="special")-(b.step==="special")||a.step-b.step);
+const cardName=id=>CAT.byId[id]?.name||id;
+
+/* ================================================================
+   STATE (Build Spec §2, starting values §11)
+   ================================================================ */
+const TIERS=["Adventurer","Veteran","Champion","Mythic","Ascendant"];
+const tierObj=()=>Object.fromEntries(TIERS.map(t=>[t,0]));
+const GRADES=["F","E","D","C","B","A","S","SS","SSS"];
+const DEFAULT_SETTINGS={
+  clock:{dayStart:420,dayEnd:1380,lateStart:1260,lateMult:1.25},
+};
+let S=null;
+function freshState(startDate){
+  const seed=Math.floor(Math.random()*2**31).toString(36)+Date.now().toString(36);
+  return {
+    meta:{app:"the-guild-console",schema:1,created:Date.now(),savedAt:Date.now(),milestone:BUILD.milestone},
+    seed,date:startDate,time:DEFAULT_SETTINGS.clock.dayStart,startDate,
+    phase:"I",stage:"closedBeta",
+    emerson:{level:1,xp:0,stats:{authority:1,thought:3,flesh:3},unspentPoints:0},
+    runtime:{maxCapacity:15,moarRank:0,pestRank:0,kernelPanicCharged:true,antivirus:false,earlyDetectRank:0},
+    shards:0,
+    packs:[{category:null,source:"Free starting pack"}],
+    pityCounters:Object.fromEntries(PACKS.map(p=>[p,0])),
+    cards:{"adventurer-registration":1},
+    codex:{},
+    foundation:{unlocked:["adventurer-registration"]},
+    projects:[],incursions:[],
+    subs:{active:tierObj(),grinders:tierObj(),trials:[],lapsed:tierObj(),waitlist:0,everReached:[]},
+    hype:{type:null,mult:1,churnMult:1,until:null,fadeUntil:null},lastContentDate:startDate,lastDevLogDate:null,
+    planes:[{id:"earth",name:"Earth",registryActive:false,weight:1,demand:"baseline",demandLocked:false,level:1,xp:0,
+      backlog:Object.fromEntries(GRADES.map(g=>[g,{paid:0,waived:0}])),innDoor:false,earthCurrency:true,waystones:[],notes:""}],
+    housing:{neighborhoods:[],owners:{apt:0,S:0,M:0,L:0},ownerPlaces:[],lapseTimers:[],waitlist:0},
+    staffing:{teams:{},autoStaff:true},
+    money:{treasury:150000,wallet:250,reserve:0,monthRevenue:0,monthExpense:0,expansionFund:0,fellowshipFund:0},
+    investors:[{name:"Emma Frost",invested:150000,units:37.5,cap:225000,paid:0,bonus:.25}],
+    contracts:[],offers:[],notifications:[],
+    journal:[],devLog:[],reports:[],processedDates:[],
+    settings:JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
+  };
+}
+/** Fill in anything a newer build added, without touching what's already there. */
+function migrate(s){
+  const base=freshState(s.date||s.startDate||"2026-08-11");
+  const fill=(dst,src)=>{for(const k in src){if(!(k in dst))dst[k]=JSON.parse(JSON.stringify(src[k]));else if(src[k]&&typeof src[k]==="object"&&!Array.isArray(src[k])&&dst[k]&&typeof dst[k]==="object"&&!Array.isArray(dst[k]))fill(dst[k],src[k])}};
+  const keepSeed=s.seed;fill(s,base);if(keepSeed)s.seed=keepSeed;
+  s.meta.schema=1;s.meta.milestone=BUILD.milestone;
+  return s;
+}
+
+/* ---------------- derived values ---------------- */
+const xpToNext=lvl=>Math.round(100*Math.pow(1.25,lvl-1));
+const efficiency=()=>Math.min(.95,.55+.05*S.emerson.stats.thought);
+const safeCapacity=()=>Math.floor(S.runtime.maxCapacity*efficiency());
+const sumTiers=o=>TIERS.reduce((s,t)=>s+(o[t]||0),0);
+const activeCount=()=>sumTiers(S.subs.active);
+const trialCount=()=>S.subs.trials.reduce((s,t)=>s+t.count,0);
+const usedCapacity=()=>activeCount()+trialCount();
+const isLive=cardId=>S.projects.some(p=>p.cardId===cardId&&p.status==="live");
+const STAGES={closedBeta:"Closed Beta",openBeta:"Open Beta",launched:"1.0 Launch",postLaunch:"Post-launch"};
+const PHASES={I:"Phase I · Founder-operated",II:"Phase II · Expansion",III:"Phase III · Cooperative"};
+
+/* ================================================================
+   JOURNAL, NOTIFICATIONS, CLOCK
+   ================================================================ */
+const JCATS=["Development","Security","Cards","Guild","Subscribers","Planes and Contracts","Money","Dev Logs","Story","End Day","System"];
+/** Append a timestamped Journal entry. */
+function log(text,cat="System",at){S.journal.push({d:S.date,t:at??S.time,cat,text})}
+function notify(title,body){S.notifications.push({id:"n"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),date:S.date,title,body,read:false})}
+const C=()=>S.settings.clock;
+/** Real minutes an action of `mins` nominal minutes takes, starting now (after 9 PM, work runs 25% slower). */
+function actionCost(mins){const {lateStart,lateMult}=C();let t=S.time,left=mins,real=0;
+  while(left>1e-9){if(t>=lateStart){real+=left*lateMult;left=0;break}const before=Math.min(left,lateStart-t);real+=before;t+=before;left-=before}
+  return Math.round(real)}
+/** Spend time on a tool action. Returns the real minutes used. */
+function spend(mins,text,cat){const real=actionCost(mins);const at=S.time;S.time+=real;if(text)log(text+(real!==mins?` (${fmtDur(real)} — late penalty)`:""),cat,at);return real}
+/** Story scenes move the clock by hand, with no late penalty. */
+function scene(hours,note){const m=Math.round(hours*60);const at=S.time;S.time+=m;log(`Scene (${fmtDur(m)})${note?": "+note:""}`,"Story",at)}
+
+/* ================================================================
+   END DAY (Build Spec §7). Steps switch on in later milestones.
+   ================================================================ */
+let ending=false;
+function endDay(){
+  if(ending||!S)return;
+  if(S.time<C().dayEnd-180&&!confirm(`End ${fmtDate(S.date)} at ${fmtTime(S.time)}?`))return;
+  ending=true;
+  try{
+    const date=S.date;
+    // 0. Guard: a date is never processed twice.
+    if(S.processedDates.includes(date)){toast("This date was already processed.");return}
+    const rep={date,endedAt:S.time,sections:{}};
+    const line=(sec,t)=>(rep.sections[sec]=rep.sections[sec]||[]).push(t);
+    // 1. Runtime security ........ milestone 6
+    // 2. Subscribers ............. milestone 7
+    // 3. Planes and quests ....... milestone 8
+    // 4. Earned revenue .......... milestone 9
+    // 5. Daily costs ............. milestone 10
+    // 6. Month close ............. milestone 10 (book totals roll over now)
+    const next=addDays(date,1);
+    if(monthKey(next)!==monthKey(date)){
+      line("Money",`${fmtMonth(monthKey(date))} closed. Revenue ${fmtCr(S.money.monthRevenue)}, expenses ${fmtCr(S.money.monthExpense)}.`);
+      S.money.monthRevenue=0;S.money.monthExpense=0;
+    }
+    // 7. Wrap-up
+    if(!Object.keys(rep.sections).length)line("Runtime","A quiet night. Nothing in the Runtime simulates yet.");
+    S.reports.push(rep);
+    const summary=Object.values(rep.sections).flat().join(" ");
+    log(`End Day at ${fmtTime(S.time)}. ${summary}`,"End Day");
+    S.processedDates.push(date);
+    S.date=next;S.time=C().dayStart;
+    log(`Good morning. ${fmtDateLong(next)}.`,"System");
+    commit("endday");
+    UI.modal={type:"report",date};render();
+  }finally{ending=false}
+}
+
+/* ================================================================
+   SAVE: browser copy + private GitHub data repo (same split as Finn's tools)
+   ================================================================ */
+const LS={save:"tgc.save",gh:"tgc.gh",db:"tgc.db",dirty:"tgc.dirty",synced:"tgc.syncedAt",sha:"tgc.saveSha",tab:"tgc.tab"};
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){console.warn(e);return false}}
+let syncState="off",syncMsg="Not connected to GitHub",pushTimer=null;
+function saveLocal(dirty){if(!S)return;lsSet(LS.save,S);if(dirty){lsSet(LS.dirty,true);if(GH.ready()){syncState="dirty";syncMsg="Unsynced changes";if(GH.mode()==="change"){clearTimeout(pushTimer);pushTimer=setTimeout(()=>GH.pushSave(),12000)}}}}
+/** Call after any change to the state. */
+function commit(reason){S.meta.savedAt=Date.now();saveLocal(true);if(reason==="endday"&&GH.ready()&&GH.mode()!=="manual")GH.pushSave()}
+const b64enc=s=>{const b=new TextEncoder().encode(s);let bin="";for(let i=0;i<b.length;i+=0x8000)bin+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(bin)};
+const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,"")),c=>c.charCodeAt(0)));
+const GH={
+  cfg(){return lsGet(LS.gh,null)},
+  ready(){const c=this.cfg();return !!(c&&c.owner&&c.repo&&c.token)},
+  mode(){return (this.cfg()||{}).mode||"change"},
+  url(path,withRef){const c=this.cfg();return `https://api.github.com/repos/${encodeURIComponent(c.owner)}/${encodeURIComponent(c.repo)}/contents/${path}`+(withRef?`?ref=${encodeURIComponent(c.branch||"main")}`:"")},
+  headers(){return {Authorization:"Bearer "+this.cfg().token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}},
+  async get(path){
+    const r=await fetch(this.url(path,true),{headers:this.headers(),cache:"no-store"});
+    if(r.status===404)return null;
+    if(!r.ok)throw new Error(`GitHub ${r.status} reading ${path}: ${(await r.text()).slice(0,140)}`);
+    const j=await r.json();let text;
+    if(j.content&&j.encoding==="base64")text=b64dec(j.content);
+    else{const r2=await fetch(this.url(path,true),{headers:{...this.headers(),Accept:"application/vnd.github.raw+json"},cache:"no-store"});text=await r2.text()}
+    return {data:JSON.parse(text),sha:j.sha};
+  },
+  async put(path,data,sha,message){
+    const c=this.cfg();
+    const body={message,content:b64enc(JSON.stringify(data,null,1)),branch:c.branch||"main"};if(sha)body.sha=sha;
+    const r=await fetch(this.url(path,false),{method:"PUT",headers:{...this.headers(),"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(!r.ok){const e=new Error(`GitHub ${r.status} saving ${path}`);e.status=r.status;throw e}
+    return (await r.json()).content.sha;
+  },
+  async loadDBs(){const cd=await this.get("cards.json");if(cd){setCards(cd.data);lsSet(LS.db,{cards:cd.data})}return {cards:!!cd}},
+  async pullSave(force){
+    const rem=await this.get("save.json");
+    if(!rem){lsSet(LS.sha,null);return "none"}
+    lsSet(LS.sha,rem.sha);
+    const remoteAt=rem.data.meta?.savedAt||0,localAt=S?.meta?.savedAt||0,dirty=lsGet(LS.dirty,false);
+    if(force||!S||(!dirty&&remoteAt>=localAt)){S=migrate(rem.data);saveLocal(false);lsSet(LS.dirty,false);lsSet(LS.synced,remoteAt);return "loaded"}
+    if(dirty&&remoteAt>(lsGet(LS.synced,0))){
+      if(confirm("GitHub has a newer save than the last one this browser synced, and this browser also has unsynced changes.\n\nOK = load GitHub's save (this browser's changes are dropped)\nCancel = keep this browser's save (it will overwrite GitHub on next sync)")){S=migrate(rem.data);saveLocal(false);lsSet(LS.dirty,false);lsSet(LS.synced,remoteAt);return "loaded"}
+    }
+    return "kept";
+  },
+  async pushSave(){
+    if(!this.ready()||!S)return;
+    clearTimeout(pushTimer);
+    if(this.busy){this.again=true;return}
+    this.busy=true;
+    try{await this._push()}finally{this.busy=false}
+    if(this.again){this.again=false;return this.pushSave()}
+  },
+  async _push(){
+    syncState="busy";syncMsg="Saving to GitHub…";renderStatus();
+    const msg=`${S.date} ${fmtTime(S.time)}`;
+    try{
+      let sha=lsGet(LS.sha,null);
+      try{sha=await this.put("save.json",S,sha,msg)}
+      catch(e){
+        if(e.status===409||e.status===422){
+          const rem=await this.get("save.json");const remoteAt=rem?.data?.meta?.savedAt||0;
+          if(rem&&remoteAt>lsGet(LS.synced,0)&&!confirm("GitHub's save changed since this browser last synced (another device?). Overwrite it with this browser's save?"))throw new Error("Sync paused — resolve in Settings");
+          sha=await this.put("save.json",S,rem?.sha,msg);
+        }else throw e;
+      }
+      lsSet(LS.sha,sha);lsSet(LS.dirty,false);lsSet(LS.synced,S.meta.savedAt);
+      syncState="ok";syncMsg="Saved to GitHub "+new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
+    }catch(e){syncState="err";syncMsg=e.message;console.error(e)}
+    renderStatus();
+  },
+};
+
+/* ================================================================
+   NEW GAME
+   ================================================================ */
+function newGame(startDate){
+  S=freshState(startDate);
+  log("Hello, World.","System",S.time);
+  log("The Akh Runtime is online. Initial capacity: 15 connections, 10 safe at 70% efficiency.","System");
+  log("Seed investment from Emma Frost received: 150,000 Cr (37.5 units, 225,000 Cr cap).","Money");
+  log("Foundation track: New Core Card — Adventurer Registration. 1 free starting pack.","Cards");
+  notify("New Core Card: Adventurer Registration","Your first Foundation project: the HUD, levels, stats and vitals every Adventurer will see. Uncommon System · 20 hrs to code. Projects open in milestone 4.");
+  notify("Free starting pack","You have one pack to open in the category of your choice. Pack opening arrives in milestone 3.");
+  S.meta.savedAt=Date.now();
+  saveLocal(true);
+}
+
+/* ================================================================
+   UI
+   ================================================================ */
+const TABS=[["projects","Projects"],["runtime","Runtime"],["cards","Cards"],["codex","Codex"],["guild","Guild"],["planes","Planes"],["economy","Economy"],["contracts","Contracts"],["devlog","Dev Log"],["ledger","Ledger"],["settings","Settings"]];
+const UI={tab:lsGet(LS.tab,"projects"),modal:null,jMonth:null,exportDay:null};
+const SEAL=`<svg viewBox="0 0 120 70" aria-hidden="true"><g fill="none" stroke="#d9b25a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M46 36C34 35 18 29 6 14c10 5 21 7 31 7M40 27c-9-1-18-5-25-10M44 43c-10 1-20-1-29-6"/><path d="M74 36c12-1 28-7 40-22-10 5-21 7-31 7M80 27c9-1 18-5 25-10M76 43c10 1 20-1 29-6"/></g><circle cx="60" cy="36" r="12" fill="#d9b25a"/><circle cx="60" cy="36" r="17" fill="none" stroke="#f1d48c" stroke-width="1.4" opacity=".6"/></svg>`;
+
+function soon(m,what){return `<div class="panel soon"><div class="tag">Milestone ${m}</div><div class="muted small" style="margin-top:4px">${what}</div></div>`}
+
+function renderStatus(){const el=$("#syncDot");if(!el)return;el.className="sync "+syncState;el.title=syncMsg;const sm=$("#syncMsg");if(sm)sm.textContent=syncMsg}
+
+function topHTML(){
+  if(!S)return `<div class="row"><div class="brand">${SEAL}<b>The Guild Console</b></div></div>`;
+  const c=C(),late=S.time>=c.lateStart,over=S.time>=c.dayEnd;
+  const e=S.emerson,need=xpToNext(e.level),unread=S.notifications.filter(n=>!n.read).length;
+  return `<div class="row">
+    <div class="brand">${SEAL}<b>The Guild</b><button id="syncDot" class="sync ${syncState}" title="${esc(syncMsg)}" aria-label="Sync status"></button></div>
+    <div class="clock ${over?"over":late?"late":""}"><div class="d">${esc(fmtDate(S.date))}</div><div class="t">${fmtTime(S.time)}</div>${over?`<div class="lw">Past 11 PM</div>`:late?`<div class="lw">After 9 PM · +25% time</div>`:""}</div>
+    <button class="btn gold" id="endDay">End Day</button>
+  </div>
+  <div class="row stats">
+    <div class="lvl"><span class="chip">Lv <b>${e.level}</b></span><div class="bar" title="${e.xp} / ${need} XP"><i style="width:${clamp(e.xp/need*100,0,100)}%"></i></div><span class="small mono muted">${fmtN(e.xp)}/${fmtN(need)}</span></div>
+    <span class="chip" title="Authority">A <b>${e.stats.authority}</b></span><span class="chip" title="Thought">T <b>${e.stats.thought}</b></span><span class="chip" title="Flesh">F <b>${e.stats.flesh}</b></span>
+    <span class="chip" title="Guild treasury"><b>${fmtN(Math.round(S.money.treasury))}</b> Cr</span>
+    <span class="chip" title="Glyph shards">◈ <b>${fmtN(S.shards)}</b></span>
+    <span class="chip stage">${STAGES[S.stage]}</span>
+    <button class="iconbtn" id="bellBtn" aria-label="Notifications">🔔${unread?`<span class="n">${unread}</span>`:""}</button>
+    <button class="iconbtn" id="snapBtn">Snapshot</button>
+  </div>
+  <nav id="tabs">${TABS.map(([k,l])=>`<button data-tab="${k}" class="${UI.tab===k?"on":""}">${l}</button>`).join("")}</nav>`;
+}
+
+/* ---------------- views ---------------- */
+const VIEWS={};
+function cardHTML(id,count){const c=CAT.byId[id]||{name:id,rarity:"C",pack:"?"};return `<div class="gcard ${c.core?"core":""}">${count>1?`<span class="ct">×${count}</span>`:""}<div class="rar r-${c.rarity}">${RAR[c.rarity]||""}</div><div class="nm">${esc(c.name)}</div>${c.flavor?`<div class="small muted" style="font-style:italic">${esc(c.flavor)}</div>`:""}<div class="meta">${c.core?"Core · Foundation step "+c.step:PACKNAME[c.pack]||c.pack}</div></div>`}
+function heldCardsHTML(){const ids=Object.keys(S.cards).filter(k=>S.cards[k]>0);return ids.length?`<div class="cardrow">${ids.map(k=>cardHTML(k,S.cards[k])).join("")}</div>`:`<div class="empty">No cards in hand.</div>`}
+
+VIEWS.projects=()=>`
+  <div class="panel"><div class="hd"><h2>Projects</h2><span class="pill">${S.projects.length} deployed</span></div>
+    ${S.projects.length?"":`<div class="empty">Nothing deployed yet. The Runtime is a quiet starfield, waiting for its first constellation.</div>`}
+  </div>
+  <div class="panel"><h3>Cards ready to build</h3>${heldCardsHTML()}</div>
+  ${soon(4,"Code, Test and Deploy projects; latent Bugs; Integrity, Repair, Upgrade, Optimize, Backup and Rollback; deploy XP. Project cards with version, Integrity bar, scarab counts and quick buttons.")}`;
+
+VIEWS.runtime=()=>{const max=S.runtime.maxCapacity,safe=safeCapacity(),used=usedCapacity();
+  return `<div class="grid">
+  <div class="panel"><div class="hd"><h2>Capacity</h2><span class="pill">${used} / ${safe} safe · ${max} max</span></div>
+    <div class="gauge"><i class="safe" style="width:${safe/max*100}%"></i><i class="act" style="width:${used/max*100}%"></i></div>
+    <div class="legend"><span>active ${used}</span><span>safe ${safe}</span><span>max ${max}</span></div>
+    <dl class="kv" style="margin-top:10px"><dt>Efficiency (55% + 5% × Thought)</dt><dd>${pct(efficiency())}</dd><dt>MOAR SERVERS!!! rank</dt><dd>${S.runtime.moarRank}</dd><dt>Waitlist</dt><dd>${fmtN(S.subs.waitlist)}</dd></dl></div>
+  <div class="panel"><h2>Security</h2>
+    <dl class="kv"><dt>Kernel Panic</dt><dd class="${S.runtime.kernelPanicCharged?"gold":"dim"}">${S.runtime.kernelPanicCharged?"Charged":"Spent"}</dd><dt>Antivirus</dt><dd>${S.runtime.antivirus?"Live":"Not built"}</dd><dt>PEST CONTROL rank</dt><dd>${S.runtime.pestRank}</dd><dt>Open incursions</dt><dd>${S.incursions.length}</dd></dl></div>
+  </div>
+  ${soon(6,"Bug discovery, malfunctions, attacks and Viruses, Bug Swarms, and the LeMat-cylinder incursion panel with Kernel Panic in the center.")}`};
+
+VIEWS.cards=()=>{const core=coreCards();const un=S.foundation.unlocked;
+  return `<div class="grid">
+  <div class="panel"><div class="hd"><h2>Unopened packs</h2><span class="pill on">${S.packs.length}</span></div>
+    ${S.packs.length?`<ul class="plain">${S.packs.map(p=>`<li>${esc(p.source)} · ${p.category?PACKNAME[p.category]:"category of your choice"}</li>`).join("")}</ul>`:`<div class="empty">None.</div>`}
+    <div class="small muted" style="margin-top:6px">Opening packs arrives in milestone 3.</div></div>
+  <div class="panel"><div class="hd"><h2>Glyph shards</h2><span class="pill on">◈ ${S.shards}</span></div><div class="small muted">10 shards buy a pack of your chosen category. The shard store sells cards already in the Codex.</div></div>
+  </div>
+  <div class="panel"><h2>In hand</h2>${heldCardsHTML()}</div>
+  <div class="panel"><div class="hd"><h2>Foundation track</h2><span class="small muted">Core cards are granted, never drawn</span></div>
+    <div class="track">${core.map(c=>{const live=isLive(c.id),on=un.includes(c.id);return `<div class="step ${live?"live":on?"un":""}"><div class="k">${c.step==="special"?"✦":c.step}</div><div><div>${esc(c.name)} <span class="small r-${c.rarity}">${RAR[c.rarity]}</span></div><div class="s">Unlocks: ${esc(c.unlocks)} · Turns on: ${esc(c.effect?.turnsOn||"")}</div></div><span class="pill ${live?"live":on?"on":""}">${live?"Live":on?"Unlocked":"Locked"}</span></div>`}).join("")}</div></div>
+  <div class="panel"><div class="hd"><h3>Catalog</h3><span class="small muted">${CAT.cards.length} cards · ${CAT.source==="repo"?"from cards.json":"built-in copy"}</span></div>
+    <div class="small muted">${["Core",...PACKS].map(p=>`${PACKNAME[p]} ${CAT.cards.filter(c=>c.pack===p).length}`).join(" · ")}</div></div>
+  ${soon(3,"Packs (2–4 cards, rarity odds, pity, MOAR SERVERS!!! protection), the shard store, dissolving spares, and the Codex.")}`};
+
+VIEWS.codex=()=>`<div class="panel"><h2>Codex</h2>${Object.keys(S.codex).length?"":`<div class="empty">No entries yet. Every card she deploys gets a permanent entry here, with her Expertise.</div>`}</div>${soon(3,"Discovered cards with Expertise bars (ranks at 10 / 30 / 70 / 150 hrs).")}`;
+
+VIEWS.guild=()=>`<div class="grid">
+  <div class="panel"><h2>The Guild</h2><div class="small muted" style="font-style:italic;margin-bottom:8px">Power in the Hands of the People.</div>
+    <dl class="kv"><dt>Phase</dt><dd>${PHASES[S.phase]}</dd><dt>Stage</dt><dd>${STAGES[S.stage]}</dd><dt>Guildmaster</dt><dd>Emerson Imani Mercer</dd><dt>Staffing efficiency</dt><dd>1.00× (Phase I)</dd></dl></div>
+  <div class="panel"><h2>Phase I costs</h2><dl class="kv"><dt>Emerson's salary</dt><dd>1,500 Cr / mo</dd><dt>Retained counsel</dt><dd>300 Cr / mo</dd><dt>Department teams</dt><dd>None yet</dd></dl></div>
+  </div>${soon(10,"Departments and teams (headcount vs. minimum and peak), auto-staff, payroll and the staffing efficiency multiplier, switched on in Phase II.")}`;
+
+VIEWS.planes=()=>`<div class="grid">${S.planes.map(p=>`<div class="panel"><div class="hd"><h2>${esc(p.name)}</h2><span class="pill">${p.demand}</span></div>
+  <dl class="kv"><dt>Registry</dt><dd>${p.registryActive?"Active":"Not active"}</dd><dt>Guild Standing</dt><dd>Lv ${p.level} · Newcomer</dd><dt>Activity weight</dt><dd>${p.weight}</dd><dt>Inn door</dt><dd>${p.innDoor?"Yes":"No"}</dd><dt>Earth currency</dt><dd>${p.earthCurrency?"Yes":"No"}</dd><dt>Waystones</dt><dd>${p.waystones.length}</dd></dl></div>`).join("")}</div>
+  ${soon(8,"Add plane, demand states, quest postings and completions by grade, backlogs, plane XP, Guild Standing, Waystone lists and contract-offer rolls.")}`;
+
+VIEWS.economy=()=>{const m=S.money;return `<div class="grid">
+  <div class="panel"><h2>Treasury</h2><dl class="kv"><dt>Guild treasury</dt><dd class="gold">${fmtCr(m.treasury)}</dd><dt>Emergency reserve</dt><dd>${fmtCr(m.reserve)}</dd><dt>Expansion fund</dt><dd>${fmtCr(m.expansionFund)}</dd><dt>Fellowship fund</dt><dd>${fmtCr(m.fellowshipFund)}</dd></dl></div>
+  <div class="panel"><h2>${fmtMonth(monthKey(S.date))}</h2><dl class="kv"><dt>Earned revenue</dt><dd>${fmtCr(m.monthRevenue)}</dd><dt>Expenses</dt><dd>${fmtCr(m.monthExpense)}</dd><dt>Surplus so far</dt><dd>${fmtCr(m.monthRevenue-m.monthExpense)}</dd></dl></div>
+  <div class="panel"><h2>Investors</h2><table><tr><th>Name</th><th class="n">Units</th><th class="n">Paid / cap</th></tr>${S.investors.map(i=>`<tr><td>${esc(i.name)}</td><td class="n">${i.units}</td><td class="n">${fmtN(i.paid)} / ${fmtN(i.cap)}</td></tr>`).join("")}</table><div class="small muted" style="margin-top:6px">Paid only from the 15% investor pool. No votes, no ownership, no Medu Netjer rights.</div></div>
+  <div class="panel"><h2>Subscribers</h2><dl class="kv"><dt>Active</dt><dd>${activeCount()}</dd><dt>Trial</dt><dd>${trialCount()}</dd><dt>Lapsed</dt><dd>${sumTiers(S.subs.lapsed)}</dd><dt>Waitlist</dt><dd>${S.subs.waitlist}</dd></dl></div>
+  </div>${soon(7,"Subscriber flows, trials, tier mix and hype (7); revenue services (9); costs, month close and the surplus waterfall (10).")}`};
+
+VIEWS.contracts=()=>`<div class="panel"><h2>Contracts</h2>${S.contracts.length?"":`<div class="empty">No contracts yet. Deals made in scenes get entered here.</div>`}</div>${soon(11,"Contract ledger with schedules and offsets, incoming offer cards, Add investor, Fellowships.")}`;
+
+VIEWS.devlog=()=>`<div class="panel"><h2>Dev Log</h2><div class="small muted">What Emerson chooses to tell members. The Journal records what happened; the Dev Log is her voice.</div>${S.devLog.length?"":`<div class="empty" style="margin-top:6px">No posts yet.</div>`}</div>${soon(11,"Writing area, release-preview tag, dated archive, and the 1-hr Post a Dev Log action with its small hype bump.")}`;
+
+VIEWS.ledger=()=>{
+  const months=[...new Set(S.journal.map(j=>monthKey(j.d)))].sort().reverse();
+  const mk=UI.jMonth&&months.includes(UI.jMonth)?UI.jMonth:months[0];
+  const entries=S.journal.filter(j=>monthKey(j.d)===mk);
+  let lastD=null,rows="";
+  for(let i=entries.length-1;i>=0;i--){const j=entries[i];if(j.d!==lastD){rows+=`<div class="jday">${esc(fmtDate(j.d))}</div>`;lastD=j.d}rows+=`<div class="tm">${fmtTime(j.t).replace(/ \(\+\d+d\)/,"+")}</div><div class="tx"><span class="c">${esc(j.cat)}</span>${esc(j.text)}</div>`}
+  const days=[...new Set(S.journal.map(j=>j.d))].sort().reverse();
+  const ed=UI.exportDay&&days.includes(UI.exportDay)?UI.exportDay:days[0];
+  return `<div class="grid">
+  <div class="panel"><h2>Guild treasury</h2><div class="mono gold" style="font-size:1.4rem">${fmtCr(S.money.treasury)}</div><div class="small muted">The cooperative's money.</div></div>
+  <div class="panel"><h2>Emerson's wallet</h2><div class="mono gold" style="font-size:1.4rem">${fmtCr(S.money.wallet)}</div><div class="small muted">Her own money. Her salary lands here at month close.</div></div>
+  </div>
+  <div class="panel"><div class="hd"><h2>Export a day</h2></div>
+    <div class="two"><select id="exDay">${days.map(d=>`<option value="${d}" ${d===ed?"selected":""}>${esc(fmtDate(d))}</option>`).join("")}</select><div class="btns" style="margin:0"><button class="btn" data-act="exDayCopy">Copy</button><button class="btn" data-act="exDayDl">Download .md</button></div></div></div>
+  <div class="panel"><div class="hd"><h2>Journal</h2><select id="jMonth" style="width:auto">${months.map(m=>`<option value="${m}" ${m===mk?"selected":""}>${fmtMonth(m)}</option>`).join("")}</select></div>
+    <div class="jr">${rows||`<div class="empty">Nothing yet.</div>`}</div></div>`};
+
+VIEWS.settings=()=>{const g=GH.cfg()||{};return `
+  <div class="panel"><div class="hd"><h2>GitHub save</h2><span class="small" id="syncMsg">${esc(syncMsg)}</span></div>
+    <div class="small muted">The page is public; your save and card catalog live in a private repo (<span class="mono">the-guild-console-data</span>). The token stays in this browser only.</div>
+    <div class="two"><div><label class="f">Owner</label><input id="ghOwner" value="${esc(g.owner||"8BitBoar")}" autocapitalize="off" autocomplete="off"></div><div><label class="f">Repo</label><input id="ghRepo" value="${esc(g.repo||"the-guild-console-data")}" autocapitalize="off" autocomplete="off"></div></div>
+    <div class="two"><div><label class="f">Branch</label><input id="ghBranch" value="${esc(g.branch||"main")}" autocapitalize="off"></div><div><label class="f">Save to GitHub</label><select id="ghMode"><option value="change" ${(g.mode||"change")==="change"?"selected":""}>After changes</option><option value="endday" ${g.mode==="endday"?"selected":""}>After End Day</option><option value="manual" ${g.mode==="manual"?"selected":""}>Manual only</option></select></div></div>
+    <label class="f">Fine-grained token (Contents: Read and write)</label><input id="ghToken" type="password" value="${esc(g.token||"")}" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="btns"><button class="btn gold" data-act="ghConnect">Save &amp; connect</button><button class="btn" data-act="ghPush" ${GH.ready()?"":"disabled"}>Save to GitHub now</button><button class="btn" data-act="ghPull" ${GH.ready()?"":"disabled"}>Load from GitHub</button><button class="btn" data-act="ghReloadCards" ${GH.ready()?"":"disabled"}>Reload cards.json</button><button class="btn danger" data-act="ghForget" ${g.token?"":"disabled"}>Forget token</button></div></div>
+  <div class="panel"><h2>Backup</h2><div class="small muted">A file copy that doesn't depend on GitHub or this browser.</div>
+    <div class="btns"><button class="btn" data-act="export">Export save</button><button class="btn" data-act="import">Import save</button></div></div>
+  ${S?`<div class="panel"><h2>Story controls</h2><div class="small muted">Scenes move the clock by hand. Personal life isn't simulated.</div>
+    <div class="btns"><button class="btn" data-act="scene">Scene: __ hrs</button></div></div>
+  <div class="panel"><h2>This save</h2><dl class="kv"><dt>Founding date</dt><dd>${esc(fmtDate(S.startDate))}</dd><dt>Days processed</dt><dd>${S.processedDates.length}</dd><dt>Seed</dt><dd>${esc(S.seed)}</dd><dt>Build</dt><dd>${BUILD.version} · milestone ${BUILD.milestone}</dd></dl>
+    <div class="btns"><button class="btn danger" data-act="newGame">Start a new save…</button></div></div>`:""}
+  ${soon(9,"The tunables panel (§9): every number in one place, grouped as the dump doc groups them. Changing a setting never rewrites history.")}`};
+
+VIEWS.snapshot=()=>{const md=snapshotMD();return `<div class="panel"><div class="hd"><h2>Snapshot</h2><div class="btns" style="margin:0"><button class="btn" data-act="snapCopy">Copy</button><button class="btn" data-act="snapDl">Download .md</button><button class="btn" data-act="back">Close</button></div></div><pre class="md">${esc(md)}</pre></div>`};
+
+VIEWS.credits=()=>`<div class="panel"><div class="hd"><h2>Credits &amp; licenses</h2><button class="btn small" data-act="back">Close</button></div>
+  <p>The Guild Console is a personal fan tool for an original character, Emerson Imani Mercer, and her Guild. Not for sale, not official, not affiliated with anyone below.</p>
+  <ul class="plain">
+    <li>Set in a Marvel-adjacent continuity (Krakoa, the Phoenix, Emma Frost and others belong to Marvel). Unofficial fan content.</li>
+    <li>Dev Tool cards reference <i>Yu-Gi-Oh!</i> (Konami) and <i>Magic: The Gathering</i> (Wizards of the Coast) cards by name and rules only. Unofficial fan content.</li>
+    <li>Medu Netjer is the Egyptian name for hieroglyphic writing; the Guild's glyph motifs are drawn by hand in code.</li>
+    <li>Emerson's winged sun-disk seal and the starfield are drawn in code. No generated images.</li>
+    <li>Card catalog: <span class="mono">cards.json</span> in the private data repo${CAT.cards.length?` (${CAT.cards.length} cards)`:""}.</li>
+  </ul></div>`;
+
+/* ---------------- Markdown: Snapshot and Export a day ---------------- */
+function snapshotMD(){
+  const e=S.emerson,m=S.money,L=[];
+  L.push(`# The Guild — Snapshot`,`${fmtDateLong(S.date)}, ${fmtTime(S.time)} · ${STAGES[S.stage]} · ${PHASES[S.phase]}`,"");
+  L.push(`## Emerson`,`- Concept Level ${e.level} (${fmtN(e.xp)} / ${fmtN(xpToNext(e.level))} XP)${e.unspentPoints?` · ${e.unspentPoints} unspent stat point(s)`:""}`,`- Authority ${e.stats.authority} · Thought ${e.stats.thought} · Flesh ${e.stats.flesh}`,"");
+  L.push(`## Runtime`,`- Capacity: ${usedCapacity()} active / ${safeCapacity()} safe / ${S.runtime.maxCapacity} max · efficiency ${pct(efficiency())}`,`- Kernel Panic ${S.runtime.kernelPanicCharged?"charged":"spent"} · Antivirus ${S.runtime.antivirus?"live":"not built"} · PEST CONTROL rank ${S.runtime.pestRank}`,`- Incursions: ${S.incursions.length?S.incursions.length:"none"}`,"");
+  L.push(`## Projects`);if(!S.projects.length)L.push("- None deployed yet");L.push("");
+  L.push(`## Foundation track`);for(const c of coreCards()){const st=isLive(c.id)?"live":S.foundation.unlocked.includes(c.id)?"unlocked":"locked";L.push(`- ${c.step==="special"?"Special":"Step "+c.step}: ${c.name} — ${st}`)}L.push("");
+  const held=Object.keys(S.cards).filter(k=>S.cards[k]>0);
+  L.push(`## Cards and shards`,`- In hand: ${held.length?held.map(k=>cardName(k)+(S.cards[k]>1?` ×${S.cards[k]}`:"")).join(", "):"none"}`,`- Unopened packs: ${S.packs.length}`,`- Glyph shards: ${S.shards}`,`- Codex entries: ${Object.keys(S.codex).length}`,"");
+  L.push(`## Subscribers`,`- Active ${activeCount()} · Trial ${trialCount()} · Lapsed ${sumTiers(S.subs.lapsed)} · Waitlist ${S.subs.waitlist}`,`- Tier mix: ${TIERS.map(t=>`${t} ${S.subs.active[t]}`).join(", ")}`,"");
+  L.push(`## Money`,`- Guild treasury: ${fmtCr(m.treasury)} · Emerson's wallet: ${fmtCr(m.wallet)}`,`- This month: revenue ${fmtCr(m.monthRevenue)}, expenses ${fmtCr(m.monthExpense)}`,`- Reserve ${fmtCr(m.reserve)} · Expansion fund ${fmtCr(m.expansionFund)} · Fellowship fund ${fmtCr(m.fellowshipFund)}`,...S.investors.map(i=>`- Investor: ${i.name}, ${i.units} units, paid ${fmtCr(i.paid)} of ${fmtCr(i.cap)}`),"");
+  L.push(`## Planes`,...S.planes.map(p=>`- ${p.name}: Standing Lv ${p.level}, demand ${p.demand}, Registry ${p.registryActive?"active":"not active"}, ${p.waystones.length} Waystone(s)${p.innDoor?", Inn door":""}`),"");
+  L.push(`## Contracts`,S.contracts.length?S.contracts.map(c=>`- ${c.party}: ${c.type}`).join("\n"):"- None","");
+  L.push(`## Housing`,S.housing.neighborhoods.length?`- ${S.housing.neighborhoods.length} neighborhood(s)`:"- Housing Plane not built","");
+  L.push(`## Recent journal`);for(const j of S.journal.slice(-12))L.push(`- ${j.d} ${fmtTime(j.t)} [${j.cat}] ${j.text}`);
+  return L.join("\n");
+}
+const EXPORT_SECTIONS=["Development","Security","Cards","Guild","Subscribers","Planes and Contracts","Money","Dev Logs"];
+function exportDayMD(date){
+  const ents=S.journal.filter(j=>j.d===date),L=[`# ${fmtDateLong(date)} — The Guild`,""];
+  const rep=S.reports.find(r=>r.date===date);
+  for(const sec of EXPORT_SECTIONS){const items=ents.filter(j=>j.cat===sec);const rl=rep?.sections?.[sec]||[];L.push(`## ${sec}`);if(!items.length&&!rl.length)L.push("- Nothing");for(const j of items)L.push(`- ${fmtTime(j.t)}: ${j.text}`);for(const t of rl)L.push(`- Overnight: ${t}`);L.push("")}
+  L.push(`## Journal`);for(const j of ents)L.push(`- ${fmtTime(j.t)} [${j.cat}] ${j.text}`);
+  return L.join("\n");
+}
+
+/* ---------------- modals ---------------- */
+function modalHTML(){
+  const m=UI.modal;if(!m)return "";
+  if(m.type==="report"){const r=S.reports.find(x=>x.date===m.date);const secs=r?Object.entries(r.sections):[];
+    return `<div class="mback" data-act="closeModal"><div class="mbox" role="dialog" aria-label="End Day report"><div class="hd"><h2>Overnight · ${esc(fmtDate(m.date))}</h2><button class="btn small" data-act="closeModal">Morning</button></div>
+    ${secs.map(([k,v])=>`<h3 style="margin-top:6px">${esc(k)}</h3><ul class="plain">${v.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`).join("")}
+    <p class="small muted" style="margin-top:12px">Ended at ${fmtTime(r?.endedAt||0)}. It's now 7:00 AM, ${esc(fmtDate(S.date))}.</p></div></div>`}
+  if(m.type==="bell"){const ns=[...S.notifications].reverse();
+    return `<div class="mback" data-act="closeModal"><div class="mbox" role="dialog" aria-label="Notifications"><div class="hd"><h2>Notifications</h2><div class="btns" style="margin:0"><button class="btn small" data-act="readAll">Mark all read</button><button class="btn small" data-act="closeModal">Close</button></div></div>
+    ${ns.length?ns.map(n=>`<div class="note ${n.read?"read":""}"><b>${esc(n.title)}</b><div class="small muted">${esc(fmtDate(n.date))}</div><div class="small" style="margin-top:3px">${esc(n.body)}</div></div>`).join(""):`<div class="empty">Nothing new.</div>`}</div></div>`}
+  if(m.type==="scene")return `<div class="mback" data-act="closeModal"><div class="mbox" role="dialog" aria-label="Scene"><div class="hd"><h2>Scene</h2><button class="btn small" data-act="closeModal">Cancel</button></div>
+    <div class="small muted">Meals, training, family, flights, Jeff. Moves the clock with no late penalty.</div>
+    <label class="f">Hours</label><input id="sceneHrs" type="number" inputmode="decimal" min="0.25" step="0.25" value="1">
+    <label class="f">Note (optional)</label><input id="sceneNote" placeholder="Breakfast with Mom and Sekhmet">
+    <div class="btns"><button class="btn gold" data-act="sceneGo">Advance clock</button></div></div></div>`;
+  return "";
+}
+
+/* ---------------- first run ---------------- */
+function firstRunHTML(){
+  return `<div class="first panel">${SEAL.replace("<svg","<svg class=\"seal\"")}
+    <div class="hello">Hello, World.</div>
+    <h2 style="margin:8px 0 4px">The Guild Console</h2>
+    <p class="muted small">Emerson's developer side of the Akh Runtime. Pick the date the founding scene sets, or connect to GitHub to load an existing save.</p>
+    <label class="f" style="text-align:left">Founding date</label><input id="startDate" type="date" value="2026-08-11">
+    <div class="btns" style="justify-content:center"><button class="btn gold" data-act="begin">Begin</button><button class="btn" data-act="goSettings">Connect to GitHub</button><button class="btn" data-act="import">Import save</button></div></div>`;
+}
+
+/* ---------------- render ---------------- */
+function render(){
+  $("#top").innerHTML=topHTML();
+  if(!S&&UI.tab!=="settings"&&UI.tab!=="credits"){$("#view").innerHTML=firstRunHTML()}
+  else{const fn=VIEWS[UI.tab]||VIEWS.projects;$("#view").innerHTML=fn()}
+  $("#modal").innerHTML=modalHTML();
+  document.body.classList.toggle("noscroll",!!UI.modal);
+  renderStatus();
+  const on=$("#tabs button.on");if(on)on.scrollIntoView({block:"nearest",inline:"nearest"});
+}
+function go(tab){UI.tab=tab;if(TABS.some(t=>t[0]===tab))lsSet(LS.tab,tab);render();window.scrollTo({top:0})}
+
+/* ---------------- events ---------------- */
+document.addEventListener("click",async ev=>{
+  const tabB=ev.target.closest("[data-tab]");if(tabB){go(tabB.dataset.tab);return}
+  if(ev.target.closest("#endDay")){endDay();return}
+  if(ev.target.closest("#snapBtn")){go("snapshot");return}
+  if(ev.target.closest("#bellBtn")){UI.modal={type:"bell"};render();return}
+  if(ev.target.closest("#syncDot")){go("settings");return}
+  if(ev.target.closest("#creditsLink")){go("credits");return}
+  const a=ev.target.closest("[data-act]");if(!a)return;
+  const act=a.dataset.act;
+  if(act==="closeModal"){if(a.classList.contains("mback")&&ev.target!==a)return;
+    if(UI.modal?.type==="bell"){S.notifications.forEach(n=>n.read=true);commit()}
+    UI.modal=null;render();return}
+  switch(act){
+    case "readAll":S.notifications.forEach(n=>n.read=true);commit();render();break;
+    case "begin":{const d=$("#startDate").value;if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){toast("Pick a date");return}newGame(d);go("projects");if(GH.ready()&&GH.mode()!=="manual")GH.pushSave();break}
+    case "goSettings":go("settings");break;
+    case "back":go(lsGet(LS.tab,"projects"));break;
+    case "snapCopy":copyText(snapshotMD());break;
+    case "snapDl":download(`guild-snapshot-${S.date}.md`,snapshotMD(),"text/markdown");break;
+    case "exDayCopy":copyText(exportDayMD($("#exDay").value));break;
+    case "exDayDl":{const d=$("#exDay").value;download(`guild-day-${d}.md`,exportDayMD(d),"text/markdown");break}
+    case "scene":UI.modal={type:"scene"};render();setTimeout(()=>$("#sceneHrs")?.focus(),30);break;
+    case "sceneGo":{const h=parseFloat($("#sceneHrs").value);if(!(h>0)||h>24){toast("Enter hours between 0 and 24");return}scene(h,$("#sceneNote").value.trim());commit();UI.modal=null;render();toast(`Clock: ${fmtTime(S.time)}`);break}
+    case "export":if(!S){toast("No save yet");return}download(`guild-save-${S.date}.json`,JSON.stringify(S,null,1));break;
+    case "import":$("#importFile").click();break;
+    case "newGame":{if(!confirm("Start a new save? This browser's save is replaced (export a backup first). If GitHub is connected, the next sync overwrites save.json there too."))return;const d=prompt("Founding date (YYYY-MM-DD)",S.startDate);if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d))return;newGame(d);go("projects");break}
+    case "ghConnect":await ghConnect();break;
+    case "ghPush":await GH.pushSave();render();break;
+    case "ghPull":{if(!confirm("Load save.json from GitHub, replacing this browser's save?"))return;syncState="busy";syncMsg="Loading…";renderStatus();try{const r=await GH.pullSave(true);syncState="ok";syncMsg=r==="none"?"No save.json on GitHub yet":"Loaded from GitHub";}catch(e){syncState="err";syncMsg=e.message}render();break}
+    case "ghReloadCards":try{const g=await GH.loadDBs();toast(g.cards?`Loaded ${CAT.cards.length} cards`:"No cards.json in the repo — using the built-in copy")}catch(e){toast(e.message)}render();break;
+    case "ghForget":{const c=GH.cfg()||{};delete c.token;lsSet(LS.gh,c);syncState="off";syncMsg="Not connected to GitHub";render();break}
+  }
+});
+document.addEventListener("change",ev=>{
+  if(ev.target.id==="jMonth"){UI.jMonth=ev.target.value;render()}
+  if(ev.target.id==="exDay"){UI.exportDay=ev.target.value}
+});
+$("#importFile").addEventListener("change",async ev=>{
+  const f=ev.target.files[0];ev.target.value="";if(!f)return;
+  try{const data=JSON.parse(await f.text());
+    if(!data||data.meta?.app!=="the-guild-console"||!data.emerson||!data.date)throw new Error("That file isn't a Guild Console save.");
+    if(S&&!confirm(`Replace this browser's save (${fmtDate(S.date)}) with the file's (${fmtDate(data.date)})?`))return;
+    S=migrate(data);commit("import");toast("Save imported");go("projects");
+  }catch(e){toast(e.message,4000)}
+});
+async function ghConnect(){
+  const c={owner:$("#ghOwner").value.trim(),repo:$("#ghRepo").value.trim(),branch:$("#ghBranch").value.trim()||"main",token:$("#ghToken").value.trim(),mode:$("#ghMode").value};
+  lsSet(LS.gh,c);
+  if(!GH.ready()){toast("Fill in owner, repo and token.");return}
+  syncState="busy";syncMsg="Connecting…";render();
+  try{
+    const got=await GH.loadDBs();
+    const r=await GH.pullSave(false);
+    if(r==="none"){if(S)await GH.pushSave();else{syncState="ok";syncMsg="Connected — no save on GitHub yet"}}
+    else{syncState=lsGet(LS.dirty,false)?"dirty":"ok";syncMsg=r==="loaded"?"Loaded save from GitHub":"Connected — this browser's save kept"}
+    toast(`Connected. ${CAT.cards.length} cards${got.cards?"":" (no cards.json in the repo — using the built-in copy)"}.`,3500);
+  }catch(err){syncState="err";syncMsg=err.message}
+  render();
+}
+
+/* ---------------- starfield (drawn in code) ---------------- */
+function drawSky(){
+  const cv=$("#sky"),dpr=Math.min(2,window.devicePixelRatio||1),w=innerWidth,h=innerHeight;
+  cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext("2d");g.scale(dpr,dpr);
+  const bg=g.createRadialGradient(w*.7,h*.15,0,w*.7,h*.15,Math.max(w,h));bg.addColorStop(0,"#121a3f");bg.addColorStop(.55,"#0a1029");bg.addColorStop(1,"#05081a");g.fillStyle=bg;g.fillRect(0,0,w,h);
+  const r=mulberry32(1081026);const n=Math.round(w*h/2600);
+  for(let i=0;i<n;i++){const x=r()*w,y=r()*h,s=r()<.06?1.4:r()*.9+.2,a=.25+r()*.6;g.fillStyle=r()<.12?`rgba(241,212,140,${a})`:`rgba(220,226,255,${a})`;g.beginPath();g.arc(x,y,s,0,7);g.fill()}
+  // a few faint golden constellations
+  g.strokeStyle="rgba(217,178,90,.13)";g.lineWidth=1;
+  for(let k=0;k<4;k++){let x=r()*w,y=r()*h;g.beginPath();g.moveTo(x,y);const pts=[[x,y]];for(let j=0;j<5;j++){x+=(r()-.5)*160;y+=(r()-.5)*120;g.lineTo(x,y);pts.push([x,y])}g.stroke();g.fillStyle="rgba(241,212,140,.5)";for(const [px,py] of pts){g.beginPath();g.arc(px,py,1.6,0,7);g.fill()}}
+}
+let skyT;addEventListener("resize",()=>{clearTimeout(skyT);skyT=setTimeout(drawSky,150)});
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+(async function boot(){
+  drawSky();
+  const db=lsGet(LS.db,null);setCards(db&&db.cards?db.cards:DEFAULT_CARDS);
+  const local=lsGet(LS.save,null);
+  if(local)S=migrate(local);
+  render();
+  if(GH.ready()){
+    syncState="busy";syncMsg="Syncing…";renderStatus();
+    try{await GH.loadDBs();const r=await GH.pullSave(false);if(r==="none"&&S)await GH.pushSave();
+      else{syncState=lsGet(LS.dirty,false)?"dirty":"ok";syncMsg=lsGet(LS.dirty,false)?"Unsynced changes":"In sync with GitHub"}}
+    catch(e){syncState="err";syncMsg=e.message}
+    render();
+  }
+  addEventListener("beforeunload",()=>{if(GH.ready()&&lsGet(LS.dirty,false)&&GH.mode()!=="manual")GH.pushSave()});
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&GH.ready()&&lsGet(LS.dirty,false)&&GH.mode()==="change")GH.pushSave()});
+})();
+</script>
+</body>
+</html>
