@@ -128,7 +128,7 @@ textarea{min-height:90px;resize:vertical}
 .catbtn:disabled{opacity:.45;cursor:not-allowed}
 .catbtn:not(:disabled):hover{border-color:var(--gold)}
 .codex{display:flex;flex-direction:column;gap:6px}
-.proj .pl,.prog .pl{display:grid;grid-template-columns:62px 1fr auto;gap:8px;align-items:center;font-size:.8rem;color:var(--muted);margin:5px 0}
+.proj .pl,.prog .pl,.mbox .pl{display:grid;grid-template-columns:62px 1fr auto;gap:8px;align-items:center;font-size:.8rem;color:var(--muted);margin:5px 0}
 .prog{margin-top:6px}
 .bar.red>i{background:linear-gradient(90deg,#a3403a,var(--red))} .bar.amber>i{background:linear-gradient(90deg,#a8762b,var(--amber))}
 .proj.off{border-color:rgba(226,100,92,.45);opacity:.85}
@@ -143,6 +143,11 @@ h3.sect{margin:16px 2px 8px;color:var(--muted);font-family:var(--sans);font-size
 .pick{text-align:left;background:rgba(5,8,20,.5);border:1px solid rgba(217,178,90,.15);color:var(--text);border-radius:8px;padding:8px 10px;font:inherit;cursor:pointer}
 .pick.on{border-color:var(--gold);background:rgba(217,178,90,.1)}
 .consts{width:100%;height:auto;display:block;max-height:300px}
+.cyl{width:100%;max-width:300px;display:block;margin:8px auto}
+.chamber{cursor:pointer;outline:none}.chamber:hover circle,.chamber:focus circle{stroke:#f1d48c;stroke-width:2.5}
+.chamber.kp:not(.on){cursor:not-allowed}
+.kpglow{animation:pulse 1.6s infinite}
+.icob{background:none;border:0;color:inherit;cursor:pointer;padding:0}
 .node{cursor:pointer;outline:none} .node:hover circle:nth-of-type(2),.node:focus circle:nth-of-type(2){filter:drop-shadow(0 0 3px #f1d48c)}
 .zoom{margin-top:8px;border-top:1px solid var(--line);padding-top:10px}
 .const1{width:100%;max-width:360px;height:auto;display:block;margin:0 auto 6px}
@@ -203,7 +208,7 @@ footer button{background:none;border:0;color:var(--muted);text-decoration:underl
 <div id="app">
   <header id="top"></header>
   <main id="view"></main>
-  <footer><span>The Guild Console · Akh Runtime · milestone 5</span> · <button id="creditsLink">Credits &amp; licenses</button></footer>
+  <footer><span>The Guild Console · Akh Runtime · milestone 6</span> · <button id="creditsLink">Credits &amp; licenses</button></footer>
 </div>
 <div id="modal"></div>
 <div id="toast"></div>
@@ -216,7 +221,7 @@ footer button{background:none;border:0;color:var(--muted);text-decoration:underl
    Canon rules: "Emerson & The Guild — Dump Doc".
    Build order and End Day sequence: "The Guild Console — Build Spec".
    ================================================================ */
-const BUILD={milestone:5,version:"0.5.1"};
+const BUILD={milestone:6,version:"0.6.0"};
 const DEFAULT_CARDS={"version":1,"notes":"Card catalog for The Guild Console. Rarity: C/U/R/M. 'defaults' lists values the dump doc didn't set. Core cards are granted by the Foundation track and never drop from packs. Add new cards anywhere in the list; ids must be unique.","cards":[{"id":"adventurer-registration","name":"Adventurer Registration","pack":"Core","rarity":"U","category":"System","core":true,"step":0,"unlocks":"Awakening scene","effect":{"type":"core","turnsOn":"Members can exist; HUD"}},{"id":"membership-and-subscriptions","name":"Membership and Subscriptions","pack":"Core","rarity":"U","category":"System","core":true,"step":1,"unlocks":"Registration deployed","effect":{"type":"core","turnsOn":"Subscriber sim, dues"}},{"id":"phoenix-downs","name":"Phoenix Downs","pack":"Core","rarity":"R","category":"System","core":true,"step":2,"unlocks":"Membership deployed or Concept Level 2","effect":{"type":"core","turnsOn":"Down sales"}},{"id":"quest-registry","name":"Quest Registry","pack":"Core","rarity":"U","category":"System","core":true,"step":3,"unlocks":"Concept Level 3","effect":{"type":"core","turnsOn":"Planes' quest sim, Registry fees (includes the basic Party Board)"}},{"id":"chat","name":"Chat","pack":"Core","rarity":"C","category":"System","core":true,"step":4,"unlocks":"Quest Registry deployed","effect":{"type":"core","turnsOn":"Flavor"}},{"id":"guild-shop","name":"Guild Shop","pack":"Core","rarity":"U","category":"System","core":true,"step":5,"unlocks":"Concept Level 4","effect":{"type":"core","turnsOn":"Shop sim"}},{"id":"safe-zones","name":"Safe Zones","pack":"Core","rarity":"R","category":"System","core":true,"step":6,"unlocks":"Phoenix Downs deployed + Concept Level 5","effect":{"type":"core","turnsOn":"Anchors become an attack vector"}},{"id":"waystones","name":"Waystones","pack":"Core","rarity":"R","category":"System","core":true,"step":7,"unlocks":"Concept Level 6","effect":{"type":"core","turnsOn":"Waystone trips, Waystone fees"}},{"id":"guild-inn-and-tavern","name":"Guild Inn and Tavern","pack":"Core","rarity":"M","category":"System","core":true,"step":8,"unlocks":"Safe Zones deployed","effect":{"type":"core","turnsOn":"Inn sim, Inn direct costs"}},{"id":"housing-plane","name":"Housing Plane","pack":"Core","rarity":"M","category":"System","core":true,"step":9,"unlocks":"GIT deployed + Concept Level 8","effect":{"type":"core","turnsOn":"Housing sim (Guild Commons)"}},{"id":"antivirus","name":"Antivirus","pack":"Core","rarity":"U","category":"System","core":true,"step":"special","unlocks":"First Virus detected","effect":{"type":"core","turnsOn":"Auto-quarantine, detection at 25%"}},{"id":"moar-servers","name":"MOAR SERVERS!!!","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"capacity","ranks":[50,250,2500,25000,1000000],"authority":[2,4,6,8,10]},"flavor":"The solution to insufficient infrastructure is obviously more infrastructure.","defaults":["rarity"]},{"id":"pest-control","name":"PEST CONTROL","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"bugThreshold","perRank":5},"defaults":["rarity"]},{"id":"remastered","name":"REMASTERED","pack":"Perk","rarity":"M","category":"Perk","repeatable":true,"effect":{"type":"versionBonusCap","perRank":0.02,"hoursPerRank":24},"flavor":"Same game. Better everything."},{"id":"ship-it","name":"SHIP IT!","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"devTime","tag":"Expansion","pct":0.1},"defaults":["rarity"]},{"id":"asset-reuse","name":"ASSET REUSE","pack":"Perk","rarity":"C","category":"Perk","repeatable":true,"effect":{"type":"devTime","category":"Item","pctPerRank":0.05},"defaults":["rarity"]},{"id":"inheritance","name":"INHERITANCE","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"devTime","category":"Class","pctPerRank":0.1},"defaults":["rarity"]},{"id":"quality-assurance","name":"QUALITY ASSURANCE","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"latentBugs","pctPerRank":0.1},"defaults":["rarity","effect"]},{"id":"word-gets-around","name":"WORD GETS AROUND","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"signupMult","perRank":1.1},"defaults":["rarity","effect"]},{"id":"transferable-skills","name":"TRANSFERABLE SKILLS","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"expertiseTransfer","share":0.5},"flavor":"You know, this looks familiar.","defaults":["rarity","effect"]},{"id":"moar-dakka","name":"MOAR DAKKA","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"purge","perRank":0.02,"maxRank":5,"flesh":[4,5,6,7,8]},"flavor":"If it's not working, you're not using enough gun.","defaults":["rarity"],"maxRank":5},{"id":"early-detection","name":"Early Detection","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"earlyDetect","perRank":5,"floor":10},"defaults":["rarity","name"]},{"id":"vaccine-shot","name":"Vaccine Shot","pack":"Perk","rarity":"C","category":"Perk","repeatable":false,"effect":{"type":"consumable","makes":"vaccine","hoursPerRun":2},"defaults":["rarity","hoursPerRun"],"consumable":true},{"id":"changed-graphite","name":"Changed Graphite","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Faster Krakoa regrowth"},"defaults":["rarity"]},{"id":"alt-tab","name":"ALT-TAB","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Snap back to her body instantly"},"defaults":["rarity"]},{"id":"picture-in-picture","name":"PICTURE-IN-PICTURE","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"See and hear around her body from inside"},"defaults":["rarity"]},{"id":"hard-link","name":"HARD LINK","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Bring her physical body into the Runtime"},"defaults":["rarity"]},{"id":"character-creator","name":"Character Creator","pack":"DevTools","rarity":"M","category":"DevTool","hours":80,"effect":{"type":"sleeves"}},{"id":"reboot","name":"REBOOT","pack":"DevTools","rarity":"R","category":"DevTool","hours":40,"effect":{"type":"reboot"},"defaults":["rarity","hours"]},{"id":"black-rose-dragon","name":"Black Rose Dragon","pack":"DevTools","rarity":"R","category":"DevTool","hours":7,"source":"Yu-Gi-Oh! Synchro monster, Level 7","effect":{"type":"ability"},"defaults":["rarity"]},{"id":"swords-of-revealing-light","name":"Swords of Revealing Light","pack":"DevTools","rarity":"R","category":"DevTool","hours":8,"source":"Yu-Gi-Oh! Spell","effect":{"type":"ability"},"defaults":["rarity"]},{"id":"hud-feature-immersive-mode","name":"HUD Feature: Immersive Mode","pack":"System","rarity":"U","category":"System","needs":["adventurer-registration"],"effect":{"type":"feature"}},{"id":"wardrobe","name":"Wardrobe","pack":"System","rarity":"U","category":"System","needs":["guild-shop"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"dye-studio","name":"Dye Studio","pack":"System","rarity":"C","category":"System","needs":["wardrobe"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"outfit-presets","name":"Outfit Presets","pack":"System","rarity":"C","category":"System","needs":["wardrobe"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"housing-feature-sea","name":"Housing Feature: Sea","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Sea","mythic":false}},{"id":"housing-feature-snowy-mountains","name":"Housing Feature: Snowy Mountains","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Snowy Mountains","mythic":false}},{"id":"housing-feature-desert","name":"Housing Feature: Desert","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Desert","mythic":false}},{"id":"housing-feature-viking","name":"Housing Feature: Viking","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Viking","mythic":false}},{"id":"housing-feature-lowcountry-bayou","name":"Housing Feature: Lowcountry Bayou","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Lowcountry Bayou","mythic":false}},{"id":"housing-feature-treetop-forest","name":"Housing Feature: Treetop Forest","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Treetop Forest","mythic":false}},{"id":"housing-feature-rolling-hills","name":"Housing Feature: Rolling Hills","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Rolling Hills","mythic":false}},{"id":"housing-feature-mushroom-grove","name":"Housing Feature: Mushroom Grove","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Mushroom Grove","mythic":false}},{"id":"housing-feature-agora-heights","name":"Housing Feature: Agora Heights","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Agora Heights","mythic":false}},{"id":"housing-feature-sky-islands","name":"Housing Feature: Sky Islands","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Sky Islands","mythic":true}},{"id":"housing-feature-coral-reef","name":"Housing Feature: Coral Reef","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Coral Reef","mythic":true}},{"id":"housing-feature-celestial","name":"Housing Feature: Celestial","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Celestial","mythic":true}},{"id":"shapeshifter-s-wardrobe","name":"Shapeshifter's Wardrobe","pack":"Item","rarity":"U","category":"Item","effect":{"type":"item"},"defaults":["rarity"],"flavor":"Stows an outfit in inventory on shifting and restores it on shifting back."},{"id":"class-fighter","name":"Fighter","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-guardian","name":"Guardian","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-aegis-knight","name":"Aegis Knight","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-guardian"],"base":"Fighter"},{"id":"class-duelist","name":"Duelist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-blademaster","name":"Blademaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-duelist"],"base":"Fighter"},{"id":"class-berserker","name":"Berserker","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-warbringer","name":"Warbringer","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-berserker"],"base":"Fighter"},{"id":"class-mage","name":"Mage","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-elementalist","name":"Elementalist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-tempest","name":"Tempest","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-elementalist"],"base":"Mage"},{"id":"class-arcanist","name":"Arcanist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-archmage","name":"Archmage","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-arcanist"],"base":"Mage"},{"id":"class-summoner","name":"Summoner","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-planebinder","name":"Planebinder","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-summoner"],"base":"Mage"},{"id":"class-ranger","name":"Ranger","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-warden","name":"Warden","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-sentinel","name":"Sentinel","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-warden"],"base":"Ranger"},{"id":"class-marksman","name":"Marksman","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-deadeye","name":"Deadeye","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-marksman"],"base":"Ranger"},{"id":"class-beastmaster","name":"Beastmaster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-wildheart","name":"Wildheart","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-beastmaster"],"base":"Ranger"},{"id":"class-rogue","name":"Rogue","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-assassin","name":"Assassin","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-nightblade","name":"Nightblade","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-assassin"],"base":"Rogue"},{"id":"class-trickster","name":"Trickster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-phantom","name":"Phantom","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-trickster"],"base":"Rogue"},{"id":"class-scout","name":"Scout","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-pathfinder","name":"Pathfinder","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-scout"],"base":"Rogue"},{"id":"class-healer","name":"Healer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-cleric","name":"Cleric","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-hierophant","name":"Hierophant","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cleric"],"base":"Healer"},{"id":"class-druid","name":"Druid","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-archdruid","name":"Archdruid","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-druid"],"base":"Healer"},{"id":"class-bard","name":"Bard","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-virtuoso","name":"Virtuoso","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-bard"],"base":"Healer"},{"id":"class-gunner","name":"Gunner","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-gunslinger","name":"Gunslinger","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-pistolero","name":"Pistolero","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-gunslinger"],"base":"Gunner"},{"id":"class-grenadier","name":"Grenadier","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-bombardier","name":"Bombardier","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-grenadier"],"base":"Gunner"},{"id":"class-gunmage","name":"Gunmage","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-spellslinger","name":"Spellslinger","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-gunmage"],"base":"Gunner"},{"id":"class-buccaneer","name":"Buccaneer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-corsair","name":"Corsair","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-dread-captain","name":"Dread Captain","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-corsair"],"base":"Buccaneer"},{"id":"class-cannoneer","name":"Cannoneer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-broadside","name":"Broadside","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cannoneer"],"base":"Buccaneer"},{"id":"class-sea-dog","name":"Sea Dog","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-reaver","name":"Reaver","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-sea-dog"],"base":"Buccaneer"},{"id":"class-gatherer","name":"Gatherer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Gathering"},{"id":"class-prospector","name":"Prospector","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-lodestar","name":"Lodestar","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-prospector"],"base":"Gatherer"},{"id":"class-herbalist","name":"Herbalist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-bloomkeeper","name":"Bloomkeeper","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-herbalist"],"base":"Gatherer"},{"id":"class-forager","name":"Forager","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-wayfarer","name":"Wayfarer","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-forager"],"base":"Gatherer"},{"id":"class-fisher","name":"Fisher","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Gathering"},{"id":"class-angler","name":"Angler","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-kingfisher","name":"Kingfisher","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-angler"],"base":"Fisher"},{"id":"class-deep-sea","name":"Deep-Sea","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-abyss-diver","name":"Abyss Diver","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-deep-sea"],"base":"Fisher"},{"id":"class-net-caster","name":"Net-Caster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-tidecaller","name":"Tidecaller","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-net-caster"],"base":"Fisher"},{"id":"class-artisan","name":"Artisan","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Crafting"},{"id":"class-artificer","name":"Artificer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-golemwright","name":"Golemwright","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-artificer"],"base":"Artisan"},{"id":"class-runecrafter","name":"Runecrafter","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-runemaster","name":"Runemaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-runecrafter"],"base":"Artisan"},{"id":"class-smith","name":"Smith","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-forgemaster","name":"Forgemaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-smith"],"base":"Artisan"},{"id":"class-provisioner","name":"Provisioner","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Crafting"},{"id":"class-cook","name":"Cook","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-gourmand","name":"Gourmand","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cook"],"base":"Provisioner"},{"id":"class-brewer","name":"Brewer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-brewmaster","name":"Brewmaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-brewer"],"base":"Provisioner"},{"id":"class-alchemist","name":"Alchemist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-transmuter","name":"Transmuter","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-alchemist"],"base":"Provisioner"},{"id":"class-spellblade","name":"Spellblade","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-duelist","class-elementalist"]},{"id":"class-paladin","name":"Paladin","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-guardian","class-cleric"]},{"id":"class-beastcaller","name":"Beastcaller","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-beastmaster","class-summoner"]},{"id":"class-shadowdancer","name":"Shadowdancer","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-trickster","class-bard"]},{"id":"class-sea-witch","name":"Sea Witch","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-deep-sea","class-druid"]},{"id":"class-trickshot","name":"Trickshot","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-trickster"]},{"id":"class-bounty-hunter","name":"Bounty Hunter","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-marksman"]},{"id":"class-exorcist","name":"Exorcist","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-cleric"]},{"id":"class-thunderlock","name":"Thunderlock","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunmage","class-elementalist"]},{"id":"class-pyrotechnist","name":"Pyrotechnist","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-grenadier","class-alchemist"]},{"id":"class-siegewright","name":"Siegewright","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-grenadier","class-artificer"]},{"id":"class-leviathan-raider","name":"Leviathan Raider","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-corsair","class-deep-sea"]}]};
 
 /* ---------------- small helpers ---------------- */
@@ -281,6 +286,12 @@ const DEFAULT_SETTINGS={
     reductionCap:.6,testPct:.25,testMin:.5,deployMin:15,backupMin:30,rollbackMin:60,debugMin:60,versionCap:5,optimizeAdd:5,integrityPerVersion:10,
     dupFactor:.25,redeployFactor:.5,latentPerHours:10,thoughtLatentCut:.05,latentCutCap:.6,deployXpPerHour:5,repairXpPerHour:1,versionBonusPer:.0025,versionBonusCap:.25},
   expertise:{thresholds:[10,30,70,150],cuts:[.1,.2,.3,.4]},
+  security:{malfPer:.05,malfCap:.7,malfDamage:10,growth:{Minor:5,Moderate:10,Major:15,Critical:20,Catastrophic:25},integrityDiv:10,
+    spreadAt:75,spreadChance:.2,seedLoad:10,detect:50,detectAntivirus:25,earlyPerRank:5,detectFloor:10,
+    startThreat:{Minor:20,Moderate:40,Major:60,Critical:80,Catastrophic:100},attackBase:.02,attackPerPlane:.005,attackCap:.15,
+    sevWeights:{Minor:40,Moderate:30,Major:18,Critical:10,Catastrophic:2},vectorWeights:{member:50,anchor:35,emerson:15},
+    discovery:.2,swarmAt:5,swarmPerBug:10,shotMin:15,purgeBase:.10,purgePerFlesh:.05,purgePerDakka:.02,kpSelf:30,kpConnected:15,
+    clearXp:[20,40,80,150,300],clearShards:[1,2,4,7,12],vaccineDays:7,vaccineHours:2,vaccineMin:15,rootFixDays:30},
 
 };
 let S=null;
@@ -738,6 +749,185 @@ function advanceStage(){const n=nextStage();if(!n||!stepsDone(n))return false;co
   log(`Roadmap: ${STAGES[from]} → ${STAGES[n]}. ${STAGE_NOTE[n]}.`,"Guild");notify(`Now in ${STAGES[n]}`,STAGE_NOTE[n]+".");return true}
 
 /* ================================================================
+   RUNTIME SECURITY (Build Spec §7 step 1, §8 Incursions)
+   ================================================================ */
+const SEC=()=>S.settings.security;
+const SEVS=["Minor","Moderate","Major","Critical","Catastrophic"];
+const VTYPES={Worm:"Serpent of corrupted glyphs",Trojan:"Disguised, normal-looking glyphs",Ransomware:"Black glyph chains around the constellation",Spyware:"Watching eyes in the glyphs","Devourer swarm":"Black scarabs eating code"};
+const VECTORS={member:"a member's HUD connection",anchor:"a physical anchor (Waystone, GIT door or safe zone)",emerson:"Emerson herself (a psychic or conceptual attack)"};
+const liveProjects=()=>S.projects.filter(p=>p.status==="live");
+const projById=id=>S.projects.find(p=>p.id===id);
+/** Which projects are connected [default]: a card's prerequisites and dependents; core projects link to Registration, the hub; anything with no prerequisite links to Registration too. */
+function connectedOf(p){
+  const out=new Set(),card=getCard(p.cardId)||{},reg=S.projects.find(x=>x.cardId==="adventurer-registration");
+  const deployedP=x=>x.status==="live"||x.status==="offline";
+  for(const n of card.needs||[])for(const q of S.projects)if(q.cardId===n&&deployedP(q))out.add(q);
+  for(const q of S.projects)if(q!==p&&deployedP(q)&&(getCard(q.cardId)?.needs||[]).includes(p.cardId))out.add(q);
+  if(reg&&p!==reg&&deployedP(reg)&&!(card.needs||[]).length)out.add(reg);
+  if(p===reg)for(const q of S.projects)if(q!==p&&deployedP(q)&&!(getCard(q.cardId)?.needs||[]).length)out.add(q);
+  return [...out];
+}
+const detectThreshold=()=>Math.max(SEC().detectFloor,(S.runtime.antivirus?SEC().detectAntivirus:SEC().detect)-SEC().earlyPerRank*S.runtime.earlyDetectRank);
+const vaccinated=p=>p.vaccineUntil&&p.vaccineUntil>=S.date;
+const totalBugs=()=>S.projects.filter(p=>p.status==="live").reduce((s,p)=>s+p.bugsHidden+p.bugsKnown,0);
+const malfunctionChance=()=>Math.min(SEC().malfCap,SEC().malfPer*Math.max(0,totalBugs()-5*S.runtime.pestRank));
+const connectedPlanes=()=>S.planes.filter(p=>p.registryActive).length;
+const attackChance=()=>Math.min(SEC().attackCap,SEC().attackBase+SEC().attackPerPlane*connectedPlanes());
+const sevOfThreat=t=>t<=20?"Minor":t<=40?"Moderate":t<=60?"Major":t<=80?"Critical":"Catastrophic";
+function openIncursion(p,kind,severity,threat){
+  if(S.incursions.some(i=>i.projectId===p.id&&i.kind===kind))return null;
+  const inc={id:"i"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),projectId:p.id,kind,severity,threat,startThreat:threat,traced:false,opened:S.date,shots:0};
+  S.incursions.push(inc);return inc;
+}
+function plantVirus(p,severity,vector,type,load,detected){
+  p.virus={severity,load:load??SEC().seedLoad,detected:!!detected,vector,type:type||"Worm",since:S.date};
+  if(detected)detectVirus(p);
+}
+function detectVirus(p){
+  const v=p.virus;v.detected=true;
+  openIncursion(p,"virus",v.severity,SEC().startThreat[v.severity]);
+  if(!S.flags.firstVirus){S.flags.firstVirus=S.date;checkFoundation()}
+  if(S.runtime.antivirus&&!p.quarantined){p.quarantined=true;p.autoQuarantine=true}
+  notify(`Virus detected: ${p.name}`,`${v.severity} ${v.type} at ${Math.round(v.load)}% load. ${S.runtime.antivirus?"Antivirus quarantined it. ":""}Open the incursion from the Runtime tab.`);
+}
+/** End Day step 1, overnight security. Returns report lines. */
+function runSecurity(){
+  const L=[],sc=SEC();
+  // 1. Malfunction roll
+  const mc=malfunctionChance();
+  if(mc>0&&rng("sec:malf")()<mc){const bugged=liveProjects().filter(p=>p.bugsHidden+p.bugsKnown>0);if(bugged.length){const p=bugged[Math.floor(rng("sec:malf-pick")()*bugged.length)];p.integrity=Math.max(0,p.integrity-sc.malfDamage);L.push(`Malfunction in ${p.name}: −${sc.malfDamage} Integrity (${Math.round(p.integrity)}/${p.maxIntegrity}). Chance was ${pct(mc)}.`)}}
+  // 2. Virus growth
+  for(const p of S.projects){if(!p.virus||p.status==="coding"||p.status==="testing")continue;if(p.breakpoint){L.push(`Breakpoint held the Virus in ${p.name} overnight.`);continue}
+    p.virus.load=Math.min(100,p.virus.load+sc.growth[p.virus.severity]);const dmg=p.virus.load/sc.integrityDiv;p.integrity=Math.max(0,p.integrity-dmg);
+    if(p.virus.detected)L.push(`Virus in ${p.name} grew to ${Math.round(p.virus.load)}%: −${+dmg.toFixed(1)} Integrity.`)}
+  // 3. Spread
+  for(const p of [...S.projects]){if(!p.virus||p.quarantined||p.breakpoint||p.virus.load<sc.spreadAt)continue;
+    const r=rng("sec:spread:"+p.id);if(r()<sc.spreadChance){const targets=connectedOf(p).filter(q=>q.status==="live"&&!q.virus&&!vaccinated(q));if(targets.length){const q=targets[Math.floor(r()*targets.length)];plantVirus(q,p.virus.severity,p.virus.vector,p.virus.type,sc.seedLoad,false);if(p.virus.detected)L.push(`The Virus in ${p.name} spread along a connection.`)}}}
+  // 4. Detection
+  const th=detectThreshold();
+  for(const p of S.projects)if(p.virus&&!p.virus.detected&&p.virus.load>=th){detectVirus(p);L.push(`Virus detected in ${p.name}: ${p.virus.severity} ${p.virus.type} at ${Math.round(p.virus.load)}% (threshold ${th}%). Incursion opened at ${sc.startThreat[p.virus.severity]}% threat.${p.quarantined&&S.runtime.antivirus?" Antivirus quarantined it.":""}`)}
+  // 5. New attack
+  const ac=attackChance(),ra=rng("sec:attack");
+  if(ra()<ac){const targets=liveProjects().filter(p=>!p.virus&&!vaccinated(p)&&!(p.rootFixedUntil&&p.rootFixedUntil>=S.date));
+    if(targets.length){const sev=weightedPick(sc.sevWeights,ra);const anchorsOk=isLive("waystones")||isLive("guild-inn-and-tavern")||isLive("safe-zones");
+      const vec=weightedPick({member:sc.vectorWeights.member,anchor:anchorsOk?sc.vectorWeights.anchor:0,emerson:sc.vectorWeights.emerson},ra);
+      const type=Object.keys(VTYPES)[Math.floor(ra()*5)];const p=targets[Math.floor(ra()*targets.length)];plantVirus(p,sev,vec,type,sc.seedLoad,false);
+      S.flags.attacks=(S.flags.attacks||0)+1}}
+  // 6. Bug discovery
+  let found=0;for(const p of S.projects){if(!p.bugsHidden)continue;const r=rng("sec:bugs:"+p.id);let n=0;for(let i=0;i<p.bugsHidden;i++)if(r()<sc.discovery)n++;if(n){p.bugsHidden-=n;p.bugsKnown+=n;found+=n;L.push(`${n} Bug${n>1?"s":""} reported in ${p.name} (${p.bugsKnown} known).`)}}
+  // 7. Bug Swarms
+  for(const p of S.projects)if(p.status==="live"&&p.bugsKnown>=sc.swarmAt){const t=Math.min(100,sc.swarmPerBug*p.bugsKnown);if(openIncursion(p,"swarm",sevOfThreat(t),t)){L.push(`A scarab swarm manifested in ${p.name}: ${p.bugsKnown} Bugs, ${t}% threat.`);notify(`Bug Swarm: ${p.name}`,`${p.bugsKnown} known Bugs became a swarm incursion at ${t}% threat.`)}}
+  // 8. Integrity 0% → offline
+  for(const p of S.projects)if(p.status==="live"&&p.integrity<=0){p.integrity=0;p.status="offline";L.push(`${p.name} hit 0% Integrity and went offline.`);notify(`${p.name} is offline`,"0% Integrity. Its feature is switched off until it's redeployed.")}
+  recomputeRuntime();
+  // 9. Recharge Kernel Panic; clear Breakpoints
+  if(!S.runtime.kernelPanicCharged){S.runtime.kernelPanicCharged=true;L.push("Kernel Panic recharged.")}
+  for(const p of S.projects)p.breakpoint=false;
+  return L;
+}
+/* ---- incursions: Debugging Tool shots, 15 min each ---- */
+const MODES={trace:"Trace",breakpoint:"Breakpoint",quarantine:"Quarantine",purge:"Purge",patch:"Patch",rollback:"Rollback"};
+const purgeAmt=()=>(SEC().purgeBase+SEC().purgePerFlesh*S.emerson.stats.flesh+SEC().purgePerDakka*liveRanks("moar-dakka"))*100;
+function clearIncursion(inc,how){
+  const p=projById(inc.projectId);S.incursions=S.incursions.filter(i=>i!==inc);
+  const sev=inc.kind==="swarm"?sevOfThreat(inc.startThreat):inc.severity,k=SEVS.indexOf(sev);
+  if(p){if(inc.kind==="virus"){p.virus=null;if(p.autoQuarantine||p.quarantined){p.quarantined=false;p.autoQuarantine=false}}else p.bugsKnown=0}
+  S.shards+=SEC().clearShards[k];
+  log(`Cleared the ${inc.kind==="swarm"?"Bug Swarm":`${sev} Virus`} in ${p?.name||"a project"}${how?" with "+how:""}. +${SEC().clearShards[k]} shards.`,"Security");
+  gainXP(SEC().clearXp[k],`${sev} incursion cleared`,"Security");
+}
+function shoot(inc,mode){
+  const p=projById(inc.projectId);if(!p)return false;
+  if(mode==="rollback"&&!p.backup){toast("No backup to roll back to.");return false}
+  if(mode==="quarantine"&&p.quarantined){toast("Already quarantined.");return false}
+  if(mode==="breakpoint"&&p.breakpoint){toast("Breakpoint already set for tonight.");return false}
+  if(mode==="patch"&&p.integrity>=p.maxIntegrity){toast("Integrity is full.");return false}
+  if(mode==="trace"&&inc.traced){toast("Already traced.");return false}
+  const at=S.time;spend(SEC().shotMin,null);inc.shots++;
+  let msg="";
+  switch(mode){
+    case "trace":inc.traced=true;p.lastTraced=S.date;msg=inc.kind==="virus"?`Trace: came in through ${VECTORS[p.virus?.vector]||"an unknown vector"}; ${p.virus?.type||""} (${VTYPES[p.virus?.type]||""}). Connected: ${connectedOf(p).map(q=>q.name).join(", ")||"nothing"}.`:`Trace: faulty logic in ${p.name}; ${p.bugsKnown} Bugs swarming.`;break;
+    case "breakpoint":p.breakpoint=true;msg="Breakpoint: no growth or spread tonight.";break;
+    case "quarantine":p.quarantined=true;msg="Quarantined: it can't spread, and Kernel Panic won't hit its connections.";break;
+    case "purge":{const amt=purgeAmt();inc.threat=Math.max(0,inc.threat-amt);if(inc.kind==="swarm")p.bugsKnown=Math.ceil(inc.threat/SEC().swarmPerBug-1e-9);msg=`Purge: −${+amt.toFixed(1)}% threat (${+inc.threat.toFixed(1)}% left)${inc.kind==="swarm"?`; ${p.bugsKnown} Bugs left`:""}.`;break}
+    case "patch":{const a=Math.min(p.maxIntegrity-p.integrity,patchAmt());p.integrity+=a;msg=`Patch: +${a} Integrity (${Math.round(p.integrity)}/${p.maxIntegrity}).`;break}
+    case "rollback":spend(DS().rollbackMin,null);{const b=p.backup;p.version=b.version;p.maxIntegrity=100+DS().integrityPerVersion*(p.version-1);p.integrity=Math.min(p.integrity,p.maxIntegrity);p.bugsHidden=Math.min(p.bugsHidden,b.bugsHidden);p.bugsKnown=Math.min(p.bugsKnown,b.bugsKnown);p.virus=b.virus?{...b.virus}:null;
+      msg=`Rollback from inside to the ${fmtDate(b.savedOn)} backup (V${b.version}).`;if(inc.kind==="virus"&&!p.virus)inc.threat=0;if(inc.kind==="swarm"&&p.bugsKnown<SEC().swarmAt)inc.threat=0}break;
+  }
+  log(`${MODES[mode]} on ${p.name} (${inc.kind==="swarm"?"Bug Swarm":inc.severity+" Virus"}). ${msg}`,"Security",at);
+  if(inc.threat<=0)clearIncursion(inc,mode==="rollback"?"a Rollback":"Debugging Tool");
+  return true;
+}
+function kernelPanic(inc){
+  if(!S.runtime.kernelPanicCharged){toast("Kernel Panic is recharging until End Day.");return false}
+  const p=projById(inc.projectId);const at=S.time;spend(SEC().shotMin,null);S.runtime.kernelPanicCharged=false;
+  inc.threat=0;p.integrity=Math.max(0,p.integrity-SEC().kpSelf);
+  const hit=p.quarantined?[]:connectedOf(p).filter(q=>q.status==="live");for(const q of hit)q.integrity=Math.max(0,q.integrity-SEC().kpConnected);
+  log(`KERNEL PANIC on ${p.name}: threat to 0%. −${SEC().kpSelf} Integrity${hit.length?`; −${SEC().kpConnected} to ${hit.map(q=>q.name).join(", ")}`:p.quarantined?"; quarantine spared its connections":""}.`,"Security",at);
+  clearIncursion(inc,"Kernel Panic");
+  for(const q of [p,...hit])if(q.integrity<=0&&q.status==="live"){q.status="offline";log(`${q.name} hit 0% and went offline.`,"Security")}
+  recomputeRuntime();return true;
+}
+function rootFix(p){const inc=S.incursions.find(i=>i.projectId===p.id);if(!p.lastTraced&&!(inc&&inc.traced)){toast("Trace it first.");return false}
+  const at=S.time;spend(DS().debugMin,null);p.rootFixedUntil=addDays(S.date,SEC().rootFixDays);p.lastTraced=null;
+  log(`Root-cause fix on ${p.name}: closed the hole it came through. New attacks skip it for ${SEC().rootFixDays} days.`,"Security",at);return true}
+/* ---- Vaccine Shots ---- */
+function codeVaccine(){
+  if(!isLive("vaccine-shot")){toast("Deploy the Vaccine Shot project first.");return false}
+  const cut=expertiseCut(S.codex["vaccine-shot"]?.expertiseHours||0),hrs=SEC().vaccineHours*(1-cut);
+  const at=S.time;S.time+=actionCost(hrs*60);S.codex["vaccine-shot"].expertiseHours+=hrs;S.flags.vaccines=(S.flags.vaccines||0)+1;
+  log(`Coded a Vaccine Shot (${fmtHrs(hrs)}). ${S.flags.vaccines} ready.`,"Security",at);return true;
+}
+function applyVaccine(p){
+  if(!(S.flags.vaccines>0)){toast("No Vaccine Shots ready.");return false}
+  const at=S.time;spend(SEC().vaccineMin,null);S.flags.vaccines--;
+  const had=!!p.virus;p.virus=null;p.vaccineUntil=addDays(S.date,SEC().vaccineDays);
+  const inc=S.incursions.find(i=>i.projectId===p.id&&i.kind==="virus");if(inc){S.incursions=S.incursions.filter(i=>i!==inc);if(p.autoQuarantine){p.quarantined=false;p.autoQuarantine=false}}
+  log(`Vaccine Shot on ${p.name}: ${had?"infection cured, ":""}protected until ${fmtDate(p.vaccineUntil)}.`,"Security",at);return true;
+}
+
+function cylinderSVG(inc){
+  const kp=S.runtime.kernelPanicCharged,cx=110,cy=110,R=72;const modes=Object.keys(MODES);
+  const ch=modes.map((m,i)=>{const a=-Math.PI/2+i*Math.PI*2/6,x=cx+Math.cos(a)*R,y=cy+Math.sin(a)*R;
+    return `<g class="chamber" data-act="shot" data-mode="${m}" role="button" tabindex="0" aria-label="${MODES[m]}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="30" fill="#0b1128" stroke="#d9b25a" stroke-width="1.5"/><text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle" font-size="11" fill="#f1d48c" font-family="Georgia,serif">${MODES[m]}</text></g>`}).join("");
+  return `<svg viewBox="0 0 220 220" class="cyl" role="group" aria-label="Debugging Tool cylinder">
+    <circle cx="${cx}" cy="${cy}" r="104" fill="#151d40" stroke="#6b5a2e" stroke-width="3"/>
+    <circle cx="${cx}" cy="${cy}" r="100" fill="none" stroke="#d9b25a" stroke-width=".6" stroke-dasharray="2 5" opacity=".6"/>
+    ${ch}
+    <g class="chamber kp ${kp?"on":""}" data-act="kernel" role="button" tabindex="0" aria-label="Kernel Panic"><circle cx="${cx}" cy="${cy}" r="34" fill="${kp?"#3a1410":"#0a0d1c"}" stroke="${kp?"#e2645c":"#3a3f55"}" stroke-width="2"/>
+      ${kp?`<circle cx="${cx}" cy="${cy}" r="40" fill="none" stroke="#e2645c" stroke-width="1" opacity=".5" class="kpglow"/>`:""}
+      <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="10" fill="${kp?"#ffb3ad":"#4b5270"}" font-family="monospace" font-weight="700">KERNEL</text><text x="${cx}" y="${cy+11}" text-anchor="middle" font-size="10" fill="${kp?"#ffb3ad":"#4b5270"}" font-family="monospace" font-weight="700">PANIC</text></g></svg>`;
+}
+function incursionModalHTML(m){
+  const inc=S.incursions.find(i=>i.id===m.id);
+  if(!inc)return `<div class="mback" data-act="closeModal"><div class="mbox" role="dialog"><div class="hd"><h2>Cleared</h2><button class="btn gold small" data-act="closeModal">Done</button></div><p>The threat is gone. Shooting isn't fixing: Trace showed where it came in, so a root-cause fix (Debug, 1 hr) closes the hole.</p></div></div>`;
+  const p=projById(inc.projectId),v=p.virus;
+  return `<div class="mback" data-act="closeModal"><div class="mbox" role="dialog" aria-label="Incursion"><div class="hd"><h2>${inc.kind==="swarm"?"Bug Swarm":`${inc.severity} Virus`} · ${esc(p.name)}</h2><button class="btn small" data-act="closeModal">Leave</button></div>
+    <div class="pl"><span>Threat</span><div class="bar red"><i style="width:${inc.threat}%"></i></div><span class="mono small">${+inc.threat.toFixed(1)}%</span></div>
+    <div class="pl"><span>Integrity</span><div class="bar teal"><i style="width:${p.integrity/p.maxIntegrity*100}%"></i></div><span class="mono small">${Math.round(p.integrity)}/${p.maxIntegrity}</span></div>
+    <div class="row small" style="gap:6px;margin:4px 0 2px">${p.quarantined?`<span class="pill">Quarantined</span>`:""}${p.breakpoint?`<span class="pill">Breakpoint</span>`:""}${inc.traced?`<span class="pill on">Traced</span>`:""}${inc.kind==="virus"&&v?`<span class="pill">Load ${Math.round(v.load)}%</span>`:""}<span class="pill">${inc.shots} shot${inc.shots===1?"":"s"}</span></div>
+    ${inc.traced&&v?`<div class="small muted">${esc(v.type)}: ${esc(VTYPES[v.type]||"")}. Came in through ${esc(VECTORS[v.vector]||"?")}.</div>`:""}
+    ${cylinderSVG(inc)}
+    <div class="small muted">Each shot takes 15 min. Purge −${+purgeAmt().toFixed(1)}% threat${inc.kind==="swarm"?" and its Bugs":""} · Patch +${patchAmt()} Integrity · Kernel Panic: threat to 0, −${SEC().kpSelf} Integrity here and −${SEC().kpConnected} to ${p.quarantined?"nothing (quarantined)":connectedOf(p).filter(q=>q.status==="live").map(q=>esc(q.name)).join(", ")||"nothing connected"}${S.runtime.kernelPanicCharged?"":" · recharging until End Day"}.</div>
+    ${inc.kind==="virus"&&S.flags.vaccines>0?`<div class="btns"><button class="btn" data-act="vaccinate" data-p="${p.id}">Vaccine Shot (${S.flags.vaccines}) · 15 min</button></div>`:""}</div></div>`;
+}
+function securityPanelsHTML(){
+  const sc=SEC(),inc=S.incursions;
+  return `<div class="panel"><div class="hd"><h2>Threats</h2><button class="btn small" data-act="storyAttack">Story attack…</button></div>
+    ${inc.length?inc.map(i=>{const p=projById(i.projectId);return `<div class="packrow"><div><div>${i.kind==="swarm"?SCARAB("#d9b25a","#7a5d1a"):SCARAB("#111","#e2645c")} ${i.kind==="swarm"?"Bug Swarm":`${i.severity} Virus`} · ${esc(p?.name||"?")}</div><div class="small muted">${+i.threat.toFixed(1)}% threat · opened ${esc(fmtDate(i.opened))}${p?.quarantined?" · quarantined":""}</div></div><button class="btn gold small" data-act="openInc" data-id="${i.id}">Go in</button></div>`}).join(""):`<div class="empty">No open incursions.</div>`}</div>
+  <div class="grid" style="margin-top:12px">
+  <div class="panel"><h2>Security</h2>
+    <dl class="kv"><dt>Kernel Panic</dt><dd class="${S.runtime.kernelPanicCharged?"gold":"dim"}">${S.runtime.kernelPanicCharged?"Charged":"Recharging"}</dd><dt>Antivirus</dt><dd>${S.runtime.antivirus?"Live":"Not built"}</dd><dt>Detection threshold</dt><dd>${detectThreshold()}% load</dd>
+    <dt>Known Bugs</dt><dd>${S.projects.reduce((s,p)=>s+p.bugsKnown,0)} known</dd><dt>PEST CONTROL</dt><dd>rank ${S.runtime.pestRank} · threshold ${5*S.runtime.pestRank}</dd><dt>Malfunction tonight</dt><dd>${pct(malfunctionChance())}</dd><dt>Attack tonight</dt><dd>${pct(attackChance())}</dd><dt>Purge / Patch</dt><dd>${+purgeAmt().toFixed(1)}% / +${patchAmt()}</dd></dl>
+    <div class="small muted" style="margin-top:6px">Hidden Bugs and hidden Virus load aren't shown: they surface through bug reports and detection.</div></div>
+  <div class="panel"><div class="hd"><h2>Vaccine Shots</h2><span class="pill on">${S.flags.vaccines||0} ready</span></div>
+    <div class="small muted">Cures one project's infection and protects it for ${sc.vaccineDays} days. Doesn't restore Integrity.</div>
+    <div class="btns"><button class="btn" data-act="codeVaccine" ${isLive("vaccine-shot")?"":"disabled"}>Code a shot · ${fmtHrs(sc.vaccineHours*(1-expertiseCut(S.codex["vaccine-shot"]?.expertiseHours||0)))}</button></div>
+    ${isLive("vaccine-shot")?"":`<div class="small muted" style="margin-top:4px">Needs the Vaccine Shot card (Perk pack) deployed.</div>`}</div>
+  </div>`;
+}
+
+/* ================================================================
    JOURNAL, NOTIFICATIONS, CLOCK
    ================================================================ */
 const JCATS=["Development","Security","Cards","Guild","Subscribers","Planes and Contracts","Money","Dev Logs","Story","End Day","System"];
@@ -768,7 +958,8 @@ function endDay(){
     if(S.processedDates.includes(date)){toast("This date was already processed.");return}
     const rep={date,endedAt:S.time,sections:{}};
     const line=(sec,t)=>(rep.sections[sec]=rep.sections[sec]||[]).push(t);
-    // 1. Runtime security ........ milestone 6
+    // 1. Runtime security (overnight)
+    for(const t of runSecurity())line("Security",t);
     // 2. Subscribers ............. milestone 7
     // 3. Planes and quests ....... milestone 8
     // 4. Earned revenue .......... milestone 9
@@ -780,7 +971,7 @@ function endDay(){
       S.money.monthRevenue=0;S.money.monthExpense=0;
     }
     // 7. Wrap-up
-    if(!Object.keys(rep.sections).length)line("Runtime","A quiet night. Nothing in the Runtime simulates yet.");
+    if(!Object.keys(rep.sections).length)line("Runtime","A quiet night in the Runtime.");
     S.reports.push(rep);
     const summary=Object.values(rep.sections).flat().join(" ");
     log(`End Day at ${fmtTime(S.time)}. ${summary}`,"End Day");
@@ -939,8 +1130,9 @@ function progressHTML(p,ph,label){
 function projectCardHTML(p){
   const card=getCard(p.cardId)||{};const live=p.status==="live",off=p.status==="offline";
   const ip=p.maxIntegrity?p.integrity/p.maxIntegrity:0;
-  const icons=[p.bugsKnown>=5?`<span class="ico swarm" title="Bug Swarm">${SCARAB("#d9b25a","#7a5d1a")}${SCARAB("#d9b25a","#7a5d1a")}<b>${p.bugsKnown}</b></span>`:p.bugsKnown?`<span class="ico" title="Known Bugs">${SCARAB("#d9b25a","#7a5d1a")}<b>${p.bugsKnown}</b></span>`:"",
-    p.virus?.detected?`<span class="ico" title="Virus">${SCARAB("#111","#e2645c")}<b>${Math.round(p.virus.load)}%</b></span>`:"",
+  const icons=[p.bugsKnown>=5&&S.incursions.some(i=>i.projectId===p.id&&i.kind==="swarm")?`<button class="ico swarm icob" data-act="openIncP" data-p="${p.id}" data-k="swarm" title="Bug Swarm">${SCARAB("#d9b25a","#7a5d1a")}${SCARAB("#d9b25a","#7a5d1a")}<b>${p.bugsKnown}</b></button>`:p.bugsKnown?`<span class="ico" title="Known Bugs">${SCARAB("#d9b25a","#7a5d1a")}<b>${p.bugsKnown}</b></span>`:"",
+    p.virus?.detected?`<button class="ico icob" data-act="openIncP" data-p="${p.id}" data-k="virus" title="Virus">${SCARAB("#111","#e2645c")}<b>${Math.round(p.virus.load)}%</b></button>`:"",
+    vaccinated(p)?`<span class="ico bk" title="Vaccinated">✚ ${esc(fmtDate(p.vaccineUntil).replace(/^\w+, /,""))}</span>`:"",
     p.quarantined?`<span class="ico" title="Quarantined">${LOCK}</span>`:"",
     p.backup?`<span class="ico bk" title="Backup from ${esc(fmtDate(p.backup.savedOn))}">⟲ V${p.backup.version}</span>`:""].join("");
   const qb=(act,label,dis)=>`<button class="btn small" data-act="${act}" data-p="${p.id}" ${dis?`disabled title="${esc(dis)}"`:""}>${label}</button>`;
@@ -948,7 +1140,7 @@ function projectCardHTML(p){
     <div class="hd"><div class="row" style="gap:8px"><span class="cat c-${p.category}">${CATICON[p.category]||"?"}</span><h3 style="margin:0">${esc(p.name)}</h3></div><span class="pill ${live?"live":""}">${off?"Offline":live?`V${p.version}/${p.versionCap}`:p.status==="testing"?"Testing":"Coding"}</span></div>
     ${live||off?`<div class="pl"><span>Integrity</span><div class="bar ${ip<.35?"red":ip<.7?"amber":"teal"}"><i style="width:${ip*100}%"></i></div><span class="mono small">${Math.round(p.integrity)}/${p.maxIntegrity}</span></div>
     <div class="row icons">${icons||`<span class="small dim">No known issues</span>`}</div>
-    ${p.job?progressHTML(p,p.job,`<b>${JOBNAME[p.job.kind]}</b>${p.job.kind==="upgrade"?` to V${p.job.target}`:""}${p.job.dup?" · duplicate":""}`):`<div class="btns qb">${qb("debug","Debug",p.bugsKnown?"":"No known Bugs")}${off?qb("jobRedeploy","Redeploy",""):qb("jobRepair","Repair",jobGate(p,"repair")||"")}${qb("jobUpgrade","Upgrade",jobGate(p,"upgrade"))}${qb("jobOptimize","Optimize",jobGate(p,"optimize"))}${qb("backup","Backup","")}${qb("rollback","Rollback",p.backup?"":"No backup yet")}</div>`}`
+    ${p.job?progressHTML(p,p.job,`<b>${JOBNAME[p.job.kind]}</b>${p.job.kind==="upgrade"?` to V${p.job.target}`:""}${p.job.dup?" · duplicate":""}`):`<div class="btns qb">${qb("debug","Debug",p.bugsKnown?"":"No known Bugs")}${off?qb("jobRedeploy","Redeploy",""):qb("jobRepair","Repair",jobGate(p,"repair")||"")}${qb("jobUpgrade","Upgrade",jobGate(p,"upgrade"))}${qb("jobOptimize","Optimize",jobGate(p,"optimize"))}${qb("backup","Backup","")}${qb("rollback","Rollback",p.backup?"":"No backup yet")}${p.quarantined?qb("unquarantine","Lift quarantine",p.virus?"Still infected":""):""}${p.lastTraced?qb("rootFix","Root-cause fix",""):""}${S.flags.vaccines>0&&live?qb("vaccinate","Vaccinate",""):""}</div>`}`
     :progressHTML(p,p,`${RAR[p.rarity]} ${p.category}${p.tags.length?" · "+p.tags.join(", "):""} · base ${fmtHrs(p.baseHours)}`)}
     <div class="small dim" style="margin-top:6px">${p.deployedOn?`Live since ${esc(fmtDate(p.deployedOn))}`:`Started ${esc(fmtDate(p.started))}`} · ${fmtHrs(p.hoursLogged)} logged · Expertise ${EXP_TITLES[expertiseRank(S.codex[p.cardId]?.expertiseHours||0)]}</div></div>`;
 }
@@ -1037,10 +1229,8 @@ VIEWS.runtime=()=>{const max=S.runtime.maxCapacity,safe=safeCapacity(),used=used
     <tr><td>Initial</td><td class="n">${fmtN(S.settings.capacity.base)}</td><td class="n">${fmtN(Math.floor(S.settings.capacity.base*efficiency()))}</td><td class="n">—</td><td>${S.runtime.moarRank===0?`<span class="pill live">Current</span>`:`<span class="pill">Done</span>`}</td></tr>
     ${S.settings.capacity.ranks.map((m,i)=>{const r=i+1,a=S.settings.capacity.authority[i],cur=S.runtime.moarRank===r,done=S.runtime.moarRank>r,met=S.emerson.stats.authority>=a;return `<tr><td>${ROMAN[r]}</td><td class="n">${fmtN(m)}</td><td class="n">${fmtN(Math.floor(m*efficiency()))}</td><td class="n ${met?"good":"dim"}">${a}</td><td>${cur?`<span class="pill live">Current</span>`:done?`<span class="pill">Done</span>`:r===S.runtime.moarRank+1?`<span class="pill ${met?"on":""}">${met?"Gate met":"Needs A "+a}</span>`:""}</td></tr>`}).join("")}</table>
     <div class="small muted" style="margin-top:6px">Each rank needs its own card and project (milestones 3–4). Thought fits more people on the same servers; Authority unlocks bigger ones.</div></div>
-  <div class="panel"><h2>Security</h2>
-    <dl class="kv"><dt>Kernel Panic</dt><dd class="${S.runtime.kernelPanicCharged?"gold":"dim"}">${S.runtime.kernelPanicCharged?"Charged":"Spent"}</dd><dt>Antivirus</dt><dd>${S.runtime.antivirus?"Live":"Not built"}</dd><dt>PEST CONTROL rank</dt><dd>${S.runtime.pestRank}</dd><dt>Open incursions</dt><dd>${S.incursions.length}</dd></dl></div>
   </div>
-  ${soon(6,"Bug discovery, malfunctions, attacks and Viruses, Bug Swarms, and the LeMat-cylinder incursion panel with Kernel Panic in the center.")}`};
+  <div style="margin-top:12px">${securityPanelsHTML()}</div>`};
 
 function cardHTML(id,count,opt={}){const c=getCard(id)||{name:id,rarity:"C",pack:"?"};
   const meta=c.core?"Core · step "+c.step:(PACKNAME[c.pack]||c.pack)+(c.category==="Class"&&c.tier?" · "+c.tier:"");
@@ -1251,6 +1441,14 @@ function modalHTML(){
     <div class="small muted">Releases drive signups once subscribers are simulated (milestone 7). Recorded now either way.</div>
     ${[["quiet","Quiet deploy","No announcement"],["cosmetic","Cosmetic drop","×1.1 signups · 7 days"],["content","Content update","×1.25 signups · 14 days · resets drought"],["event","Event","×1.5 signups · for the event's length"],["expansion","Expansion","×2.5 signups · 30 days, fading over 30 more"]].map(([k,l,d])=>`<button class="catbtn" data-act="release" data-rel="${k}"><b>${l}</b><span class="small muted">${d}</span></button>`).join("")}
     <label class="f">Event length (days, events only)</label><input id="relDays" type="number" min="1" step="1" value="7"></div></div>`}
+  if(m.type==="inc")return incursionModalHTML(m);
+  if(m.type==="attack"){const ps=liveProjects();return `<div class="mback" data-act="closeModal"><div class="mbox" role="dialog" aria-label="Story attack"><div class="hd"><h2>Story attack</h2><button class="btn small" data-act="closeModal">Cancel</button></div>
+    <div class="small muted">Plant a Virus from a scene. Hidden ones grow overnight until detected.</div>
+    ${ps.length?`<label class="f">Target</label><select id="atP">${ps.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select>
+    <div class="two"><div><label class="f">Severity</label><select id="atSev">${SEVS.map(s=>`<option>${s}</option>`).join("")}</select></div><div><label class="f">Type</label><select id="atType">${Object.keys(VTYPES).map(s=>`<option>${s}</option>`).join("")}</select></div></div>
+    <div class="two"><div><label class="f">Came in through</label><select id="atVec"><option value="member">A member</option><option value="anchor">An anchor</option><option value="emerson">Emerson herself</option></select></div><div><label class="f">Starting load %</label><input id="atLoad" type="number" min="1" max="100" value="10"></div></div>
+    <label class="f"><input type="checkbox" id="atDet" style="width:auto"> Detected right away (opens the incursion now)</label>
+    <div class="btns"><button class="btn danger" data-act="attackGo">Plant it</button></div>`:`<div class="empty">Nothing live to attack.</div>`}</div></div>`}
   if(m.type==="maker"){const c=m.id?S.customCards.find(x=>x.id===m.id):null,f=UI.mk;
     const pk=f.pack,opt=(v,l,cur)=>`<option value="${esc(v)}" ${v===cur?"selected":""}>${esc(l)}</option>`;
     const parents=pk==="Class"?allCards().filter(x=>x.category==="Class"&&x.id!==m.id):pk==="System"?allCards().filter(x=>(x.core||x.pack==="System")&&x.id!==m.id):[];
@@ -1339,6 +1537,22 @@ document.addEventListener("click",async ev=>{
       catch(e){syncState="err";syncMsg=e.message;toast(e.message,4000)}
       render();break}
     case "cardsDownload":{const base=CAT.source==="repo"?{version:1,notes:DEFAULT_CARDS.notes,cards:CAT.cards}:DEFAULT_CARDS;const {merged}=mergeMyCards(base);download("cards.json",JSON.stringify(merged,null,1));toast("Upload it to the data repo, then Reload cards.json in Settings",4500);break}
+    case "openInc":UI.modal={type:"inc",id:a.dataset.id};render();break;
+    case "openIncP":{const i=S.incursions.find(x=>x.projectId===a.dataset.p&&x.kind===a.dataset.k);if(i){UI.modal={type:"inc",id:i.id};render()}break}
+    case "shot":{const i=S.incursions.find(x=>x.id===UI.modal.id);if(i&&shoot(i,a.dataset.mode)){commit();render()}break}
+    case "kernel":{const i=S.incursions.find(x=>x.id===UI.modal.id);if(!i)return;const p=projById(i.projectId);if(!S.runtime.kernelPanicCharged){toast("Kernel Panic is recharging until End Day.");return}
+      const hit=p.quarantined?[]:connectedOf(p).filter(q=>q.status==="live");if(!confirm(`KERNEL PANIC on ${p.name}?\n\nThreat to 0% instantly. −${SEC().kpSelf} Integrity to ${p.name}${hit.length?` and −${SEC().kpConnected} to ${hit.map(q=>q.name).join(", ")}`:""}. Single shot; recharges at End Day.`))return;
+      if(kernelPanic(i)){commit();render()}break}
+    case "storyAttack":UI.modal={type:"attack"};render();break;
+    case "attackGo":{const p=projById($("#atP").value);if(!p)return;const det=$("#atDet").checked;const load=clamp(+$("#atLoad").value||10,1,100);
+      if(p.virus&&!confirm(`${p.name} is already infected. Replace that infection?`))return;
+      plantVirus(p,$("#atSev").value,$("#atVec").value,$("#atType").value,load,false);S.flags.attacks=(S.flags.attacks||0)+1;
+      log(`Story attack: a ${p.virus.severity} ${p.virus.type} hit ${p.name} through ${VECTORS[p.virus.vector]}${det?"":" (hidden)"}.`,"Security");
+      if(det||load>=detectThreshold())detectVirus(p);commit();const inc=S.incursions.find(i=>i.projectId===p.id&&i.kind==="virus");UI.modal=inc?{type:"inc",id:inc.id}:null;render();break}
+    case "codeVaccine":if(codeVaccine()){commit();render()}break;
+    case "vaccinate":{const p=projById(a.dataset.p);if(p&&applyVaccine(p)){commit();if(UI.modal?.type==="inc")UI.modal=null;render()}break}
+    case "unquarantine":{const p=projById(a.dataset.p);if(!p)return;p.quarantined=false;p.autoQuarantine=false;log(`Lifted the quarantine on ${p.name}.`,"Security");commit();render();break}
+    case "rootFix":{const p=projById(a.dataset.p);if(p&&rootFix(p)){commit();render()}break}
     case "advanceStage":{const n=nextStage();if(!n||!confirm(`Advance the Guild to ${STAGES[n]}? (${STAGE_NOTE[n]})`))return;if(advanceStage()){commit();render();toast(STAGES[n])}break}
     case "grantEarly":{const c=getCard(a.dataset.id);if(!confirm(`Grant ${c.name} now, ahead of its unlock conditions? The story can reorder the Foundation track.`))return;if(grantCore(c.id,"granted early by the story")){commit();render()}break}
     case "nodeClose":UI.node=null;render();break;
@@ -1398,7 +1612,7 @@ document.addEventListener("click",async ev=>{
     case "ghForget":{const c=GH.cfg()||{};delete c.token;lsSet(LS.gh,c);syncState="off";syncMsg="Not connected to GitHub";render();break}
   }
 });
-document.addEventListener("keydown",ev=>{if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches?.("[data-card],[data-node]")){ev.preventDefault();ev.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
+document.addEventListener("keydown",ev=>{if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches?.("[data-card],[data-node],.chamber")){ev.preventDefault();ev.target.dispatchEvent(new MouseEvent("click",{bubbles:true}))}});
 function readMaker(){const f=UI.mk,v=id=>$(id)?.value;if(!f)return;
   f.name=v("#mkName")??f.name;f.rarity=v("#mkRar")??f.rarity;f.desc=v("#mkDesc")??f.desc;f.flavor=v("#mkFlavor")??f.flavor;
   if($("#mkType"))f.itemType=v("#mkType");if($("#mkSrc")){f.src=v("#mkSrc");f.n=v("#mkN")}
