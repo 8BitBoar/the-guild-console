@@ -128,6 +128,22 @@ textarea{min-height:90px;resize:vertical}
 .catbtn:disabled{opacity:.45;cursor:not-allowed}
 .catbtn:not(:disabled):hover{border-color:var(--gold)}
 .codex{display:flex;flex-direction:column;gap:6px}
+.proj .pl,.prog .pl{display:grid;grid-template-columns:62px 1fr auto;gap:8px;align-items:center;font-size:.8rem;color:var(--muted);margin:5px 0}
+.prog{margin-top:6px}
+.bar.red>i{background:linear-gradient(90deg,#a3403a,var(--red))} .bar.amber>i{background:linear-gradient(90deg,#a8762b,var(--amber))}
+.proj.off{border-color:rgba(226,100,92,.45);opacity:.85}
+.cat{font:600 .64rem var(--mono);letter-spacing:.06em;padding:2px 6px;border-radius:5px;border:1px solid var(--line2);color:var(--gold2)}
+.c-Class{color:#8fb7ff;border-color:rgba(143,183,255,.4)} .c-Item{color:#62c7b8;border-color:rgba(98,199,184,.4)} .c-System{color:#e3b955} .c-DevTool{color:#c49bff;border-color:rgba(196,155,255,.4)} .c-Perk{color:#f1d48c}
+.icons{gap:10px;margin:6px 0;min-height:22px}
+.ico{display:inline-flex;align-items:center;gap:3px;font:600 .8rem var(--mono)} .ico.bk{color:var(--muted);font-weight:400}
+.scarab{width:18px;height:18px}
+.qb .btn{padding:5px 8px}
+h3.sect{margin:16px 2px 8px;color:var(--muted);font-family:var(--sans);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+.picklist{display:flex;flex-direction:column;gap:4px;max-height:34vh;overflow:auto}
+.pick{text-align:left;background:rgba(5,8,20,.5);border:1px solid rgba(217,178,90,.15);color:var(--text);border-radius:8px;padding:8px 10px;font:inherit;cursor:pointer}
+.pick.on{border-color:var(--gold);background:rgba(217,178,90,.1)}
+.consts{width:100%;height:auto;display:block}
+.panel.sky{background:radial-gradient(ellipse at 50% 30%,rgba(30,40,90,.6),rgba(8,12,30,.9))}
 .crow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px;border:1px solid rgba(217,178,90,.12);border-radius:9px;cursor:pointer}
 .crow:hover{border-color:var(--line2)}
 @media(max-width:520px){.gcard{width:calc(50% - 5px);min-height:150px}}
@@ -182,7 +198,7 @@ footer button{background:none;border:0;color:var(--muted);text-decoration:underl
 <div id="app">
   <header id="top"></header>
   <main id="view"></main>
-  <footer><span>The Guild Console · Akh Runtime · milestone 3</span> · <button id="creditsLink">Credits &amp; licenses</button></footer>
+  <footer><span>The Guild Console · Akh Runtime · milestone 4</span> · <button id="creditsLink">Credits &amp; licenses</button></footer>
 </div>
 <div id="modal"></div>
 <div id="toast"></div>
@@ -195,7 +211,7 @@ footer button{background:none;border:0;color:var(--muted);text-decoration:underl
    Canon rules: "Emerson & The Guild — Dump Doc".
    Build order and End Day sequence: "The Guild Console — Build Spec".
    ================================================================ */
-const BUILD={milestone:3,version:"0.3.1"};
+const BUILD={milestone:4,version:"0.4.0"};
 const DEFAULT_CARDS={"version":1,"notes":"Card catalog for The Guild Console. Rarity: C/U/R/M. 'defaults' lists values the dump doc didn't set. Core cards are granted by the Foundation track and never drop from packs. Add new cards anywhere in the list; ids must be unique.","cards":[{"id":"adventurer-registration","name":"Adventurer Registration","pack":"Core","rarity":"U","category":"System","core":true,"step":0,"unlocks":"Awakening scene","effect":{"type":"core","turnsOn":"Members can exist; HUD"}},{"id":"membership-and-subscriptions","name":"Membership and Subscriptions","pack":"Core","rarity":"U","category":"System","core":true,"step":1,"unlocks":"Registration deployed","effect":{"type":"core","turnsOn":"Subscriber sim, dues"}},{"id":"phoenix-downs","name":"Phoenix Downs","pack":"Core","rarity":"R","category":"System","core":true,"step":2,"unlocks":"Membership deployed or Concept Level 2","effect":{"type":"core","turnsOn":"Down sales"}},{"id":"quest-registry","name":"Quest Registry","pack":"Core","rarity":"U","category":"System","core":true,"step":3,"unlocks":"Concept Level 3","effect":{"type":"core","turnsOn":"Planes' quest sim, Registry fees (includes the basic Party Board)"}},{"id":"chat","name":"Chat","pack":"Core","rarity":"C","category":"System","core":true,"step":4,"unlocks":"Quest Registry deployed","effect":{"type":"core","turnsOn":"Flavor"}},{"id":"guild-shop","name":"Guild Shop","pack":"Core","rarity":"U","category":"System","core":true,"step":5,"unlocks":"Concept Level 4","effect":{"type":"core","turnsOn":"Shop sim"}},{"id":"safe-zones","name":"Safe Zones","pack":"Core","rarity":"R","category":"System","core":true,"step":6,"unlocks":"Phoenix Downs deployed + Concept Level 5","effect":{"type":"core","turnsOn":"Anchors become an attack vector"}},{"id":"waystones","name":"Waystones","pack":"Core","rarity":"R","category":"System","core":true,"step":7,"unlocks":"Concept Level 6","effect":{"type":"core","turnsOn":"Waystone trips, Waystone fees"}},{"id":"guild-inn-and-tavern","name":"Guild Inn and Tavern","pack":"Core","rarity":"M","category":"System","core":true,"step":8,"unlocks":"Safe Zones deployed","effect":{"type":"core","turnsOn":"Inn sim, Inn direct costs"}},{"id":"housing-plane","name":"Housing Plane","pack":"Core","rarity":"M","category":"System","core":true,"step":9,"unlocks":"GIT deployed + Concept Level 8","effect":{"type":"core","turnsOn":"Housing sim (Guild Commons)"}},{"id":"antivirus","name":"Antivirus","pack":"Core","rarity":"U","category":"System","core":true,"step":"special","unlocks":"First Virus detected","effect":{"type":"core","turnsOn":"Auto-quarantine, detection at 25%"}},{"id":"moar-servers","name":"MOAR SERVERS!!!","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"capacity","ranks":[50,250,2500,25000,1000000],"authority":[2,4,6,8,10]},"flavor":"The solution to insufficient infrastructure is obviously more infrastructure.","defaults":["rarity"]},{"id":"pest-control","name":"PEST CONTROL","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"bugThreshold","perRank":5},"defaults":["rarity"]},{"id":"remastered","name":"REMASTERED","pack":"Perk","rarity":"M","category":"Perk","repeatable":true,"effect":{"type":"versionBonusCap","perRank":0.02,"hoursPerRank":24},"flavor":"Same game. Better everything."},{"id":"ship-it","name":"SHIP IT!","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"devTime","tag":"Expansion","pct":0.1},"defaults":["rarity"]},{"id":"asset-reuse","name":"ASSET REUSE","pack":"Perk","rarity":"C","category":"Perk","repeatable":true,"effect":{"type":"devTime","category":"Item","pctPerRank":0.05},"defaults":["rarity"]},{"id":"inheritance","name":"INHERITANCE","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"devTime","category":"Class","pctPerRank":0.1},"defaults":["rarity"]},{"id":"quality-assurance","name":"QUALITY ASSURANCE","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"latentBugs","pctPerRank":0.1},"defaults":["rarity","effect"]},{"id":"word-gets-around","name":"WORD GETS AROUND","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"signupMult","perRank":1.1},"defaults":["rarity","effect"]},{"id":"transferable-skills","name":"TRANSFERABLE SKILLS","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"expertiseTransfer","share":0.5},"flavor":"You know, this looks familiar.","defaults":["rarity","effect"]},{"id":"moar-dakka","name":"MOAR DAKKA","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"purge","perRank":0.02,"maxRank":5,"flesh":[4,5,6,7,8]},"flavor":"If it's not working, you're not using enough gun.","defaults":["rarity"],"maxRank":5},{"id":"early-detection","name":"Early Detection","pack":"Perk","rarity":"U","category":"Perk","repeatable":true,"effect":{"type":"earlyDetect","perRank":5,"floor":10},"defaults":["rarity","name"]},{"id":"vaccine-shot","name":"Vaccine Shot","pack":"Perk","rarity":"C","category":"Perk","repeatable":false,"effect":{"type":"consumable","makes":"vaccine","hoursPerRun":2},"defaults":["rarity","hoursPerRun"],"consumable":true},{"id":"changed-graphite","name":"Changed Graphite","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Faster Krakoa regrowth"},"defaults":["rarity"]},{"id":"alt-tab","name":"ALT-TAB","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Snap back to her body instantly"},"defaults":["rarity"]},{"id":"picture-in-picture","name":"PICTURE-IN-PICTURE","pack":"Perk","rarity":"U","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"See and hear around her body from inside"},"defaults":["rarity"]},{"id":"hard-link","name":"HARD LINK","pack":"Perk","rarity":"R","category":"Perk","repeatable":false,"effect":{"type":"flag","flag":"Bring her physical body into the Runtime"},"defaults":["rarity"]},{"id":"character-creator","name":"Character Creator","pack":"DevTools","rarity":"M","category":"DevTool","hours":80,"effect":{"type":"sleeves"}},{"id":"reboot","name":"REBOOT","pack":"DevTools","rarity":"R","category":"DevTool","hours":40,"effect":{"type":"reboot"},"defaults":["rarity","hours"]},{"id":"black-rose-dragon","name":"Black Rose Dragon","pack":"DevTools","rarity":"R","category":"DevTool","hours":7,"source":"Yu-Gi-Oh! Synchro monster, Level 7","effect":{"type":"ability"},"defaults":["rarity"]},{"id":"swords-of-revealing-light","name":"Swords of Revealing Light","pack":"DevTools","rarity":"R","category":"DevTool","hours":8,"source":"Yu-Gi-Oh! Spell","effect":{"type":"ability"},"defaults":["rarity"]},{"id":"hud-feature-immersive-mode","name":"HUD Feature: Immersive Mode","pack":"System","rarity":"U","category":"System","needs":["adventurer-registration"],"effect":{"type":"feature"}},{"id":"wardrobe","name":"Wardrobe","pack":"System","rarity":"U","category":"System","needs":["guild-shop"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"dye-studio","name":"Dye Studio","pack":"System","rarity":"C","category":"System","needs":["wardrobe"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"outfit-presets","name":"Outfit Presets","pack":"System","rarity":"C","category":"System","needs":["wardrobe"],"effect":{"type":"feature"},"defaults":["rarity"]},{"id":"housing-feature-sea","name":"Housing Feature: Sea","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Sea","mythic":false}},{"id":"housing-feature-snowy-mountains","name":"Housing Feature: Snowy Mountains","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Snowy Mountains","mythic":false}},{"id":"housing-feature-desert","name":"Housing Feature: Desert","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Desert","mythic":false}},{"id":"housing-feature-viking","name":"Housing Feature: Viking","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Viking","mythic":false}},{"id":"housing-feature-lowcountry-bayou","name":"Housing Feature: Lowcountry Bayou","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Lowcountry Bayou","mythic":false}},{"id":"housing-feature-treetop-forest","name":"Housing Feature: Treetop Forest","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Treetop Forest","mythic":false}},{"id":"housing-feature-rolling-hills","name":"Housing Feature: Rolling Hills","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Rolling Hills","mythic":false}},{"id":"housing-feature-mushroom-grove","name":"Housing Feature: Mushroom Grove","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Mushroom Grove","mythic":false}},{"id":"housing-feature-agora-heights","name":"Housing Feature: Agora Heights","pack":"System","rarity":"R","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Agora Heights","mythic":false}},{"id":"housing-feature-sky-islands","name":"Housing Feature: Sky Islands","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Sky Islands","mythic":true}},{"id":"housing-feature-coral-reef","name":"Housing Feature: Coral Reef","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Coral Reef","mythic":true}},{"id":"housing-feature-celestial","name":"Housing Feature: Celestial","pack":"System","rarity":"M","category":"System","needs":["housing-plane"],"effect":{"type":"neighborhood","theme":"Celestial","mythic":true}},{"id":"shapeshifter-s-wardrobe","name":"Shapeshifter's Wardrobe","pack":"Item","rarity":"U","category":"Item","effect":{"type":"item"},"defaults":["rarity"],"flavor":"Stows an outfit in inventory on shifting and restores it on shifting back."},{"id":"class-fighter","name":"Fighter","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-guardian","name":"Guardian","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-aegis-knight","name":"Aegis Knight","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-guardian"],"base":"Fighter"},{"id":"class-duelist","name":"Duelist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-blademaster","name":"Blademaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-duelist"],"base":"Fighter"},{"id":"class-berserker","name":"Berserker","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fighter"],"base":"Fighter"},{"id":"class-warbringer","name":"Warbringer","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-berserker"],"base":"Fighter"},{"id":"class-mage","name":"Mage","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-elementalist","name":"Elementalist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-tempest","name":"Tempest","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-elementalist"],"base":"Mage"},{"id":"class-arcanist","name":"Arcanist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-archmage","name":"Archmage","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-arcanist"],"base":"Mage"},{"id":"class-summoner","name":"Summoner","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-mage"],"base":"Mage"},{"id":"class-planebinder","name":"Planebinder","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-summoner"],"base":"Mage"},{"id":"class-ranger","name":"Ranger","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-warden","name":"Warden","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-sentinel","name":"Sentinel","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-warden"],"base":"Ranger"},{"id":"class-marksman","name":"Marksman","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-deadeye","name":"Deadeye","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-marksman"],"base":"Ranger"},{"id":"class-beastmaster","name":"Beastmaster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-ranger"],"base":"Ranger"},{"id":"class-wildheart","name":"Wildheart","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-beastmaster"],"base":"Ranger"},{"id":"class-rogue","name":"Rogue","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-assassin","name":"Assassin","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-nightblade","name":"Nightblade","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-assassin"],"base":"Rogue"},{"id":"class-trickster","name":"Trickster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-phantom","name":"Phantom","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-trickster"],"base":"Rogue"},{"id":"class-scout","name":"Scout","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-rogue"],"base":"Rogue"},{"id":"class-pathfinder","name":"Pathfinder","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-scout"],"base":"Rogue"},{"id":"class-healer","name":"Healer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-cleric","name":"Cleric","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-hierophant","name":"Hierophant","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cleric"],"base":"Healer"},{"id":"class-druid","name":"Druid","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-archdruid","name":"Archdruid","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-druid"],"base":"Healer"},{"id":"class-bard","name":"Bard","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-healer"],"base":"Healer"},{"id":"class-virtuoso","name":"Virtuoso","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-bard"],"base":"Healer"},{"id":"class-gunner","name":"Gunner","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-gunslinger","name":"Gunslinger","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-pistolero","name":"Pistolero","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-gunslinger"],"base":"Gunner"},{"id":"class-grenadier","name":"Grenadier","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-bombardier","name":"Bombardier","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-grenadier"],"base":"Gunner"},{"id":"class-gunmage","name":"Gunmage","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gunner"],"base":"Gunner"},{"id":"class-spellslinger","name":"Spellslinger","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-gunmage"],"base":"Gunner"},{"id":"class-buccaneer","name":"Buccaneer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Combat"},{"id":"class-corsair","name":"Corsair","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-dread-captain","name":"Dread Captain","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-corsair"],"base":"Buccaneer"},{"id":"class-cannoneer","name":"Cannoneer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-broadside","name":"Broadside","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cannoneer"],"base":"Buccaneer"},{"id":"class-sea-dog","name":"Sea Dog","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-buccaneer"],"base":"Buccaneer"},{"id":"class-reaver","name":"Reaver","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-sea-dog"],"base":"Buccaneer"},{"id":"class-gatherer","name":"Gatherer","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Gathering"},{"id":"class-prospector","name":"Prospector","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-lodestar","name":"Lodestar","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-prospector"],"base":"Gatherer"},{"id":"class-herbalist","name":"Herbalist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-bloomkeeper","name":"Bloomkeeper","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-herbalist"],"base":"Gatherer"},{"id":"class-forager","name":"Forager","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-gatherer"],"base":"Gatherer"},{"id":"class-wayfarer","name":"Wayfarer","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-forager"],"base":"Gatherer"},{"id":"class-fisher","name":"Fisher","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Gathering"},{"id":"class-angler","name":"Angler","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-kingfisher","name":"Kingfisher","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-angler"],"base":"Fisher"},{"id":"class-deep-sea","name":"Deep-Sea","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-abyss-diver","name":"Abyss Diver","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-deep-sea"],"base":"Fisher"},{"id":"class-net-caster","name":"Net-Caster","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-fisher"],"base":"Fisher"},{"id":"class-tidecaller","name":"Tidecaller","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-net-caster"],"base":"Fisher"},{"id":"class-artisan","name":"Artisan","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Crafting"},{"id":"class-artificer","name":"Artificer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-golemwright","name":"Golemwright","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-artificer"],"base":"Artisan"},{"id":"class-runecrafter","name":"Runecrafter","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-runemaster","name":"Runemaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-runecrafter"],"base":"Artisan"},{"id":"class-smith","name":"Smith","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-artisan"],"base":"Artisan"},{"id":"class-forgemaster","name":"Forgemaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-smith"],"base":"Artisan"},{"id":"class-provisioner","name":"Provisioner","pack":"Class","rarity":"C","category":"Class","tier":"base","discipline":"Crafting"},{"id":"class-cook","name":"Cook","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-gourmand","name":"Gourmand","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-cook"],"base":"Provisioner"},{"id":"class-brewer","name":"Brewer","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-brewmaster","name":"Brewmaster","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-brewer"],"base":"Provisioner"},{"id":"class-alchemist","name":"Alchemist","pack":"Class","rarity":"U","category":"Class","tier":"specialization","needs":["class-provisioner"],"base":"Provisioner"},{"id":"class-transmuter","name":"Transmuter","pack":"Class","rarity":"R","category":"Class","tier":"advanced","needs":["class-alchemist"],"base":"Provisioner"},{"id":"class-spellblade","name":"Spellblade","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-duelist","class-elementalist"]},{"id":"class-paladin","name":"Paladin","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-guardian","class-cleric"]},{"id":"class-beastcaller","name":"Beastcaller","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-beastmaster","class-summoner"]},{"id":"class-shadowdancer","name":"Shadowdancer","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-trickster","class-bard"]},{"id":"class-sea-witch","name":"Sea Witch","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-deep-sea","class-druid"]},{"id":"class-trickshot","name":"Trickshot","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-trickster"]},{"id":"class-bounty-hunter","name":"Bounty Hunter","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-marksman"]},{"id":"class-exorcist","name":"Exorcist","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunslinger","class-cleric"]},{"id":"class-thunderlock","name":"Thunderlock","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-gunmage","class-elementalist"]},{"id":"class-pyrotechnist","name":"Pyrotechnist","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-grenadier","class-alchemist"]},{"id":"class-siegewright","name":"Siegewright","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-grenadier","class-artificer"]},{"id":"class-leviathan-raider","name":"Leviathan Raider","pack":"Class","rarity":"M","category":"Class","tier":"hybrid","needs":["class-corsair","class-deep-sea"]}]};
 
 /* ---------------- small helpers ---------------- */
@@ -256,8 +272,11 @@ const DEFAULT_SETTINGS={
   capacity:{base:15,ranks:[50,250,2500,25000,1000000],authority:[2,4,6,8,10]},
   cards:{rarityWeights:{C:60,U:30,R:9,M:1},minCards:2,maxCards:4,pityEvery:10,moarAt:.9,packShardCost:10,
     buyPrice:{C:10,U:20,R:50,M:150},dissolveValue:{C:2,U:5,R:12,M:40},openMinutes:5},
-  dev:{rarityBase:{C:2,U:4,R:8,M:16},catMult:{Item:1,Perk:1.5,Class:3,System:5},spellHours:{C:2,U:4,R:8,M:16}},
+  dev:{rarityBase:{C:2,U:4,R:8,M:16},catMult:{Item:1,Perk:1.5,Class:3,System:5},spellHours:{C:2,U:4,R:8,M:16},
+    reductionCap:.6,testPct:.25,testMin:.5,deployMin:15,backupMin:30,rollbackMin:60,debugMin:60,versionCap:5,optimizeAdd:5,integrityPerVersion:10,
+    dupFactor:.25,redeployFactor:.5,latentPerHours:10,thoughtLatentCut:.05,latentCutCap:.6,deployXpPerHour:5,repairXpPerHour:1,versionBonusPer:.0025,versionBonusCap:.25},
   expertise:{thresholds:[10,30,70,150],cuts:[.1,.2,.3,.4]},
+
 };
 let S=null;
 function freshState(startDate){
@@ -275,7 +294,7 @@ function freshState(startDate){
     codex:{"adventurer-registration":{expertiseHours:0,discovered:startDate,how:"granted",drawn:0,history:[]}},
     customCards:[],packsOpened:0,
     foundation:{unlocked:["adventurer-registration"]},
-    projects:[],incursions:[],
+    projects:[],incursions:[],releases:[],
     subs:{active:tierObj(),grinders:tierObj(),trials:[],lapsed:tierObj(),waitlist:0,everReached:[]},
     hype:{type:null,mult:1,churnMult:1,until:null,fadeUntil:null},lastContentDate:startDate,lastDevLogDate:null,
     planes:[{id:"earth",name:"Earth",registryActive:false,weight:1,demand:"baseline",demandLocked:false,level:1,xp:0,
@@ -296,6 +315,7 @@ function migrate(s){
   const keepSeed=s.seed;fill(s,base);if(keepSeed)s.seed=keepSeed;
   s.meta.schema=1;s.meta.milestone=BUILD.milestone;
   s.runtime.maxCapacity=maxCapacityFor(s,s.runtime.moarRank);
+  if(Array.isArray(s.projects))for(const p of s.projects){if(p.job===undefined)p.job=null;if(p.hoursLogged===undefined)p.hoursLogged=0;if(!p.releases)p.releases=[]}
   for(const id of s.foundation.unlocked)if(!s.codex[id])s.codex[id]={expertiseHours:0,discovered:s.date,how:"granted",drawn:0,history:[]};
   return s;
 }
@@ -481,6 +501,164 @@ function canDissolve(id){const c=getCard(id);if(!c||!(S.cards[id]>0))return {ok:
 function dissolve(id){const c=getCard(id),ok=canDissolve(id);if(!ok.ok){toast(ok.why);return false}const v=CS().dissolveValue[c.rarity];S.cards[id]--;if(!S.cards[id])delete S.cards[id];S.shards+=v;log(`Dissolved a spare ${c.name} for ${v} glyph shards.`,"Cards");return true}
 
 /* ================================================================
+   PROJECTS (Build Spec §8 Development time, Deploy/versions/repairs, §8b)
+   ================================================================ */
+const DS=()=>S.settings.dev;
+const liveRanks=id=>S.projects.filter(p=>p.cardId===id&&p.status==="live").length;
+const TAGS=["Expansion","Content update","Event","Cosmetic"];
+const CATICON={Item:"ITM",Perk:"PRK",Class:"CLS",System:"SYS",DevTool:"DEV"};
+/** Keep runtime ranks in step with what's live (an offline project's effect switches off). */
+function recomputeRuntime(){
+  const rt=S.runtime;
+  rt.moarRank=Math.min(liveRanks("moar-servers"),S.settings.capacity.ranks.length);
+  rt.maxCapacity=maxCapacityFor(S,rt.moarRank);
+  rt.pestRank=liveRanks("pest-control");rt.earlyDetectRank=liveRanks("early-detection");
+  rt.antivirus=isLive("antivirus");
+}
+/** Every reduction that applies to a card's coding time, capped at 60%. */
+function reductionsFor(card,tags=[]){
+  const parts=[];const x=S.codex[card.id];const own=expertiseCut(x?.expertiseHours||0);
+  let exp=own,expNote=own?`Expertise ${EXP_TITLES[expertiseRank(x.expertiseHours)]}`:"";
+  if(liveRanks("transferable-skills")){let best=0;for(const id in S.codex){const c=getCard(id);if(c&&id!==card.id&&c.category===card.category)best=Math.max(best,expertiseCut(S.codex[id].expertiseHours))}
+    if(best/2>exp){exp=best/2;expNote="TRANSFERABLE SKILLS"}}
+  if(exp)parts.push([expNote,exp]);
+  if(tags.includes("Expansion")&&liveRanks("ship-it"))parts.push(["SHIP IT!",.10]);
+  if(card.category==="Item"&&liveRanks("asset-reuse"))parts.push([`ASSET REUSE ×${liveRanks("asset-reuse")}`,.05*liveRanks("asset-reuse")]);
+  if(card.category==="Class"&&liveRanks("inheritance"))parts.push([`INHERITANCE ×${liveRanks("inheritance")}`,.10*liveRanks("inheritance")]);
+  const raw=parts.reduce((s,p)=>s+p[1],0);
+  return {parts,raw,total:Math.min(DS().reductionCap,raw)};
+}
+const testHoursFor=base=>Math.max(DS().testMin,DS().testPct*base);
+const inProgressOf=id=>S.projects.filter(p=>p.cardId===id&&(p.status==="coding"||p.status==="testing")).length;
+/** Gates a project must pass before it can start. */
+function startGate(card){
+  if(card.id==="moar-servers"){const r=liveRanks("moar-servers")+inProgressOf("moar-servers");const need=S.settings.capacity.authority[r];if(need==null)return "Every MOAR SERVERS!!! rank is built.";if(S.emerson.stats.authority<need)return `MOAR SERVERS!!! ${ROMAN[r+1]} needs Authority ${need}.`}
+  if(card.id==="moar-dakka"){const r=liveRanks("moar-dakka")+inProgressOf("moar-dakka");const need=DAKKA_FLESH[r];if(need==null)return "Every MOAR DAKKA rank is built.";if(S.emerson.stats.flesh<need)return `MOAR DAKKA ${ROMAN[r+1]} needs Flesh ${need}.`}
+  if(card.repeatable&&liveRanks(card.id)+inProgressOf(card.id)>=maxRankOf(card))return "Every rank is built.";
+  for(const n of card.needs||[]){const pc=getCard(n);if(pc&&(pc.core||pc.pack==="System")?!isLive(n):!isDeployed(n))return `Needs ${pc?.name||n} ${pc&&(pc.core||pc.pack==="System")?"live":"deployed"} first.`}
+  return null;
+}
+function planFor(card,tags){
+  const rank=card.repeatable?liveRanks(card.id)+inProgressOf(card.id)+1:1;
+  const base=baseHours(card,rank),red=reductionsFor(card,tags);
+  return {rank,base,red,code:+(base*(1-red.total)).toFixed(4),test:testHoursFor(base)};
+}
+function startProject(cardId,tags){
+  const card=getCard(cardId);if(!card||!(S.cards[cardId]>0))return null;
+  const gate=startGate(card);if(gate){toast(gate,4000);return null}
+  const pl=planFor(card,tags);
+  S.cards[cardId]--;if(!S.cards[cardId])delete S.cards[cardId];
+  const name=card.name+(card.repeatable&&(isFinite(maxRankOf(card))||pl.rank>1)?" "+(ROMAN[pl.rank]||pl.rank):"");
+  const p={id:"p"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),cardId,name,category:card.category,rarity:card.rarity,tags:[...tags],rank:pl.rank,
+    baseHours:pl.base,status:"coding",codeDone:0,codeNeeded:pl.code,testDone:0,testNeeded:pl.test,
+    version:0,versionCap:DS().versionCap,integrity:0,maxIntegrity:100,bugsHidden:0,bugsKnown:0,virus:null,quarantined:false,breakpoint:false,vaccineUntil:null,backup:null,connections:[],
+    job:null,started:S.date,deployedOn:null,releases:[],hoursLogged:0};
+  S.projects.push(p);
+  log(`Started ${name}: ${fmtHrs(pl.code)} coding${pl.red.total?` (−${pct(pl.red.total)})`:""} + ${fmtHrs(pl.test)} testing.`,"Development");
+  return p;
+}
+/** The work in progress on a project: its first build, or a job on a live one. */
+const phaseOf=p=>(p.status==="coding"||p.status==="testing")?p:p.job;
+const JOBNAME={upgrade:"Upgrade",optimize:"Optimize",repair:"Repair",redeploy:"Redeploy"};
+function work(p,kind,hours){
+  const ph=phaseOf(p);if(!ph)return 0;
+  const left=kind==="code"?ph.codeNeeded-ph.codeDone:ph.testNeeded-ph.testDone;
+  if(left<=1e-9){toast(kind==="code"?"Coding is done.":"Testing is done.");return 0}
+  if(kind==="test"&&ph.codeDone<ph.codeNeeded-1e-9){toast("Finish coding first.");return 0}
+  const h=Math.min(hours,left),at=S.time,real=actionCost(h*60);S.time+=real;
+  if(kind==="code"){ph.codeDone=+(ph.codeDone+h).toFixed(4);const x=S.codex[p.cardId]||(discover(p.cardId,"built"),S.codex[p.cardId]);x.expertiseHours=+((x.expertiseHours||0)+h).toFixed(4);if(ph.kind==="repair"||ph.kind==="redeploy")ph.repairHours=(ph.repairHours||0)+h}
+  else ph.testDone=+(ph.testDone+h).toFixed(4);
+  p.hoursLogged=+(p.hoursLogged+h).toFixed(4);
+  if(p.status==="coding"&&ph===p&&p.codeDone>=p.codeNeeded-1e-9)p.status="testing";
+  const what=ph===p?p.name:`${JOBNAME[ph.kind]} · ${p.name}`;
+  log(`${kind==="code"?"Coded":"Tested"} ${what} for ${fmtDur(h*60)} (${kind==="code"?`${+ph.codeDone.toFixed(2)}/${+ph.codeNeeded.toFixed(2)}`:`${+ph.testDone.toFixed(2)}/${+ph.testNeeded.toFixed(2)}`} hrs)${real!==Math.round(h*60)?` — ${fmtDur(real)} with the late penalty`:""}.`,"Development",at);
+  return h;
+}
+const phaseReady=ph=>ph&&ph.codeDone>=ph.codeNeeded-1e-9&&ph.testDone>=ph.testNeeded-1e-9;
+function latentBugs(p,base){
+  const th=Math.min(DS().latentCutCap,DS().thoughtLatentCut*S.emerson.stats.thought);
+  const qa=Math.min(.9,.10*liveRanks("quality-assurance"));
+  const exp=base/DS().latentPerHours*(1-th)*(1-qa);
+  return rollCount(exp,rng(`latent:${p.id}:${p.version}:${p.job?.kind||"v1"}`));
+}
+/** Deploy (15 min): consumes the card, goes live at V1, rolls latent Bugs, grants XP and the Codex entry. */
+function deploy(p){
+  if(!phaseReady(p))return false;
+  const at=S.time;spend(DS().deployMin,null);
+  p.status="live";p.version=1;p.maxIntegrity=100;p.integrity=100;p.deployedOn=S.date;
+  const bugs=latentBugs(p,p.baseHours);p.bugsHidden+=bugs;
+  discover(p.cardId,"built");S.codex[p.cardId].history.push({date:S.date,what:`Deployed ${p.name} V1`});
+  log(`Deployed ${p.name} V1.`,"Development",at);
+  recomputeRuntime();
+  gainXP(DS().deployXpPerHour*p.baseHours,`deployed ${p.name}`,"Development");
+  if(p.cardId==="moar-servers")log(`MOAR SERVERS!!! ${ROMAN[S.runtime.moarRank]} UNLOCKED. Maximum Active Connections increased to ${fmtN(S.runtime.maxCapacity)}. Please remember to test before deploying to production.`,"Development");
+  if(typeof onDeployed==="function")onDeployed(p);
+  return true;
+}
+function abandon(p){
+  if(p.status==="coding"||p.status==="testing"){addCard(p.cardId);S.projects=S.projects.filter(x=>x!==p);log(`Abandoned ${p.name}. The card went back to her hand; ${fmtHrs(p.codeDone)} of coding still counts toward Expertise.`,"Development");return}
+  if(p.job){if(p.job.dup)addCard(p.cardId);log(`Stopped the ${JOBNAME[p.job.kind]} on ${p.name}.${p.job.dup?" The duplicate went back to her hand.":""}`,"Development");p.job=null}
+}
+/** Job costs (before reductions). */
+function jobPlan(p,kind,useDup){
+  const card=getCard(p.cardId)||{id:p.cardId,category:p.category};const red=reductionsFor(card,p.tags);const f=1-red.total;
+  let base;
+  if(kind==="upgrade")base=p.baseHours*((p.version+1)/2);
+  else if(kind==="optimize")base=p.baseHours*2;
+  else if(kind==="repair")base=p.baseHours*((p.maxIntegrity-p.integrity)/p.maxIntegrity)*(useDup?DS().dupFactor:1);
+  else if(kind==="redeploy")base=p.baseHours*DS().redeployFactor*(useDup?DS().dupFactor:1);
+  const code=+(base*f).toFixed(4);
+  const test=kind==="upgrade"||kind==="optimize"?testHoursFor(base):Math.max(DS().testMin,DS().testPct*code);
+  return {base,code,test,red};
+}
+function jobGate(p,kind){
+  if(p.job)return `${JOBNAME[p.job.kind]} already in progress.`;
+  if(kind==="upgrade"){if(p.status!=="live")return "Only a live project can be upgraded.";if(p.version>=p.versionCap)return `At the version cap (V${p.versionCap}). Optimize to raise it.`;if(!(S.cards[p.cardId]>0))return "Needs a duplicate card.";}
+  if(kind==="optimize"){if(p.status!=="live")return "Only a live project can be optimized.";if(p.version<p.versionCap)return `Only at the version cap (V${p.versionCap}).`}
+  if(kind==="repair"){if(p.status!=="live")return p.status==="offline"?"Offline at 0% — Redeploy instead.":"Not deployed.";if(p.integrity>=p.maxIntegrity)return "Integrity is full."}
+  if(kind==="redeploy"&&p.status!=="offline")return "Only an offline project can be redeployed.";
+  return null;
+}
+function startJob(p,kind,useDup){
+  const g=jobGate(p,kind);if(g){toast(g,3500);return false}
+  if(useDup&&!(S.cards[p.cardId]>0)){toast("No duplicate in hand.");return false}
+  const pl=jobPlan(p,kind,useDup);
+  const dup=kind==="upgrade"||useDup;
+  if(dup){S.cards[p.cardId]--;if(!S.cards[p.cardId])delete S.cards[p.cardId]}
+  p.job={kind,dup,codeDone:0,codeNeeded:pl.code,testDone:0,testNeeded:pl.test,base:pl.base,target:kind==="upgrade"?p.version+1:null,started:S.date};
+  log(`Started ${kind==="upgrade"?`the V${p.version+1} upgrade`:JOBNAME[kind].toLowerCase()} on ${p.name}: ${fmtHrs(pl.code)} coding + ${fmtHrs(pl.test)} testing${dup?(kind==="upgrade"?" (duplicate reserved)":" (with a duplicate)"):""}.`,"Development");
+  return true;
+}
+/** Finish a job once its coding and testing are done. */
+function finishJob(p){
+  const j=p.job;if(!phaseReady(j))return false;
+  const at=S.time;const card=getCard(p.cardId);
+  if(j.kind==="upgrade"||j.kind==="optimize"||j.kind==="redeploy")spend(DS().deployMin,null);
+  if(j.kind==="upgrade"){p.version=j.target;const oldMax=p.maxIntegrity;p.maxIntegrity=100+DS().integrityPerVersion*(p.version-1);p.integrity=Math.min(p.maxIntegrity,p.integrity+(p.maxIntegrity-oldMax));
+    const b=latentBugs(p,j.base);p.bugsHidden+=b;log(`Deployed ${p.name} V${p.version}. Max Integrity ${p.maxIntegrity}.`,"Development",at);S.codex[p.cardId]?.history.push({date:S.date,what:`Upgraded to V${p.version}`});
+    p.job=null;gainXP(DS().deployXpPerHour*p.baseHours/2,`upgraded ${p.name}`,"Development")}
+  else if(j.kind==="optimize"){p.versionCap+=DS().optimizeAdd;const b=latentBugs(p,j.base);p.bugsHidden+=b;log(`Optimized ${p.name}. Version cap V${p.versionCap}.`,"Development",at);S.codex[p.cardId]?.history.push({date:S.date,what:`Optimized (cap V${p.versionCap})`});
+    p.job=null;gainXP(DS().deployXpPerHour*p.baseHours/2,`optimized ${p.name}`,"Development")}
+  else{const hrs=j.repairHours||j.codeDone;p.integrity=p.maxIntegrity;const wasOff=p.status==="offline";p.status="live";
+    log(`${wasOff?"Redeployed":"Repaired"} ${p.name}: Integrity ${p.maxIntegrity}/${p.maxIntegrity}.`,"Development",at);
+    p.job=null;recomputeRuntime();gainXP(Math.round(hrs*DS().repairXpPerHour),`${hrs.toFixed(1)} hrs of repairs`,"Development")}
+  return true;
+}
+function debugOne(p){
+  if(!(p.bugsKnown>0)){toast("No known Bugs.");return false}
+  const at=S.time;spend(DS().debugMin,null);p.bugsKnown--;S.shards+=1;
+  log(`Debugged ${p.name}: 1 Bug fixed (${p.bugsKnown} known left). +1 shard.`,"Development",at);
+  gainXP(5,"Bug fixed","Development");return true;
+}
+function backup(p){if(p.status!=="live"&&p.status!=="offline")return false;const at=S.time;spend(DS().backupMin,null);p.backup={version:p.version,versionCap:p.versionCap,bugsHidden:p.bugsHidden,bugsKnown:p.bugsKnown,virus:p.virus?{...p.virus}:null,savedOn:S.date};log(`Backed up ${p.name} V${p.version}.`,"Development",at);return true}
+function rollback(p){const b=p.backup;if(!b){toast("No backup.");return false}const at=S.time;spend(DS().rollbackMin,null);
+  p.version=b.version;p.maxIntegrity=100+DS().integrityPerVersion*(p.version-1);p.integrity=Math.min(p.integrity,p.maxIntegrity);
+  p.bugsHidden=Math.min(p.bugsHidden,b.bugsHidden);p.bugsKnown=Math.min(p.bugsKnown,b.bugsKnown);p.virus=b.virus?{...b.virus}:null;
+  log(`Rolled ${p.name} back to its backup from ${fmtDate(b.savedOn)} (V${b.version}). Integrity isn't restored.`,"Development",at);return true}
+/** Version bonus: +0.25% per version above V1 across all live projects, capped (REMASTERED raises the cap). */
+function versionBonus(){const v=S.projects.filter(p=>p.status==="live").reduce((s,p)=>s+Math.max(0,p.version-1),0);const cap=DS().versionBonusCap+.02*liveRanks("remastered");return {raw:v*DS().versionBonusPer,cap,value:Math.min(cap,v*DS().versionBonusPer)}}
+
+/* ================================================================
    JOURNAL, NOTIFICATIONS, CLOCK
    ================================================================ */
 const JCATS=["Development","Security","Cards","Guild","Subscribers","Planes and Contracts","Money","Dev Logs","Story","End Day","System"];
@@ -575,7 +753,7 @@ const GH={
     if(!rem){lsSet(LS.sha,null);return "none"}
     lsSet(LS.sha,rem.sha);
     const remoteAt=rem.data.meta?.savedAt||0,localAt=S?.meta?.savedAt||0,dirty=lsGet(LS.dirty,false);
-    if(force||!S||(!dirty&&remoteAt>=localAt)){S=migrate(rem.data);saveLocal(false);lsSet(LS.dirty,false);lsSet(LS.synced,remoteAt);return "loaded"}
+    if(force||!S||(!dirty&&remoteAt>=localAt)){S=migrate(rem.data);recomputeRuntime();saveLocal(false);lsSet(LS.dirty,false);lsSet(LS.synced,remoteAt);return "loaded"}
     if(dirty&&remoteAt>(lsGet(LS.synced,0))){
       if(confirm("GitHub has a newer save than the last one this browser synced, and this browser also has unsynced changes.\n\nOK = load GitHub's save (this browser's changes are dropped)\nCancel = keep this browser's save (it will overwrite GitHub on next sync)")){S=migrate(rem.data);saveLocal(false);lsSet(LS.dirty,false);lsSet(LS.synced,remoteAt);return "loaded"}
     }
@@ -659,12 +837,59 @@ function topHTML(){
 /* ---------------- views ---------------- */
 const VIEWS={};
 
-VIEWS.projects=()=>`
-  <div class="panel"><div class="hd"><h2>Projects</h2><span class="pill">${S.projects.length} deployed</span></div>
-    ${S.projects.length?"":`<div class="empty">Nothing deployed yet. The Runtime is a quiet starfield, waiting for its first constellation.</div>`}
-  </div>
-  <div class="panel"><h3>Cards ready to build</h3>${heldCardsHTML()}</div>
-  ${soon(4,"Code, Test and Deploy projects; latent Bugs; Integrity, Repair, Upgrade, Optimize, Backup and Rollback; deploy XP. Project cards with version, Integrity bar, scarab counts and quick buttons.")}`;
+const SCARAB=(fill,stroke)=>`<svg class="scarab" viewBox="0 0 20 20" aria-hidden="true"><g fill="${fill}" stroke="${stroke}" stroke-width="1"><ellipse cx="10" cy="11.5" rx="5" ry="6"/><circle cx="10" cy="4.6" r="2.2"/></g><path d="M10 6v11M5.2 9 2 7.5M5 12.5H1.8M5.6 15.6 3 18M14.8 9 18 7.5M15 12.5h3.2M14.4 15.6 17 18M9 3 7.5 1M11 3l1.5-2" stroke="${stroke}" stroke-width="1" fill="none" stroke-linecap="round"/></svg>`;
+const LOCK=`<svg class="scarab" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="9" rx="2" fill="#97a0b6"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="#97a0b6" stroke-width="2"/></svg>`;
+function progressHTML(p,ph,label){
+  const ready=phaseReady(ph),coding=ph.codeDone<ph.codeNeeded-1e-9;
+  const isJob=ph!==p,finish=isJob&&ph.kind==="repair"?"Finish repair":"Deploy · 15 min";
+  return `<div class="prog"><div class="small">${label}</div>
+    <div class="pl"><span>Coding</span><div class="bar"><i style="width:${clamp(ph.codeDone/ph.codeNeeded*100||0,0,100)}%"></i></div><span class="mono small">${+ph.codeDone.toFixed(2)}/${+ph.codeNeeded.toFixed(2)}</span></div>
+    <div class="pl"><span>Testing</span><div class="bar teal"><i style="width:${clamp(ph.testDone/ph.testNeeded*100||0,0,100)}%"></i></div><span class="mono small">${+ph.testDone.toFixed(2)}/${+ph.testNeeded.toFixed(2)}</span></div>
+    <div class="btns">${ready?`<button class="btn gold small" data-act="${isJob?"finishJob":"deploy"}" data-p="${p.id}">${finish}</button>`:coding?
+      `<button class="btn small" data-act="work" data-k="code" data-h="1" data-p="${p.id}">Code 1 hr</button><button class="btn small" data-act="work" data-k="code" data-h=".5" data-p="${p.id}">30 min</button>`:
+      `<button class="btn small" data-act="work" data-k="test" data-h="1" data-p="${p.id}">Test 1 hr</button><button class="btn small" data-act="work" data-k="test" data-h=".5" data-p="${p.id}">30 min</button>`}
+      <button class="btn small danger" data-act="abandon" data-p="${p.id}">${isJob?"Stop":"Abandon"}</button></div></div>`;
+}
+function projectCardHTML(p){
+  const card=getCard(p.cardId)||{};const live=p.status==="live",off=p.status==="offline";
+  const ip=p.maxIntegrity?p.integrity/p.maxIntegrity:0;
+  const icons=[p.bugsKnown>=5?`<span class="ico swarm" title="Bug Swarm">${SCARAB("#d9b25a","#7a5d1a")}${SCARAB("#d9b25a","#7a5d1a")}<b>${p.bugsKnown}</b></span>`:p.bugsKnown?`<span class="ico" title="Known Bugs">${SCARAB("#d9b25a","#7a5d1a")}<b>${p.bugsKnown}</b></span>`:"",
+    p.virus?.detected?`<span class="ico" title="Virus">${SCARAB("#111","#e2645c")}<b>${Math.round(p.virus.load)}%</b></span>`:"",
+    p.quarantined?`<span class="ico" title="Quarantined">${LOCK}</span>`:"",
+    p.backup?`<span class="ico bk" title="Backup from ${esc(fmtDate(p.backup.savedOn))}">⟲ V${p.backup.version}</span>`:""].join("");
+  const qb=(act,label,dis)=>`<button class="btn small" data-act="${act}" data-p="${p.id}" ${dis?`disabled title="${esc(dis)}"`:""}>${label}</button>`;
+  return `<div class="panel proj ${off?"off":""}">
+    <div class="hd"><div class="row" style="gap:8px"><span class="cat c-${p.category}">${CATICON[p.category]||"?"}</span><h3 style="margin:0">${esc(p.name)}</h3></div><span class="pill ${live?"live":""}">${off?"Offline":live?`V${p.version}/${p.versionCap}`:p.status==="testing"?"Testing":"Coding"}</span></div>
+    ${live||off?`<div class="pl"><span>Integrity</span><div class="bar ${ip<.35?"red":ip<.7?"amber":"teal"}"><i style="width:${ip*100}%"></i></div><span class="mono small">${Math.round(p.integrity)}/${p.maxIntegrity}</span></div>
+    <div class="row icons">${icons||`<span class="small dim">No known issues</span>`}</div>
+    ${p.job?progressHTML(p,p.job,`<b>${JOBNAME[p.job.kind]}</b>${p.job.kind==="upgrade"?` to V${p.job.target}`:""}${p.job.dup?" · duplicate":""}`):`<div class="btns qb">${qb("debug","Debug",p.bugsKnown?"":"No known Bugs")}${off?qb("jobRedeploy","Redeploy",""):qb("jobRepair","Repair",jobGate(p,"repair")||"")}${qb("jobUpgrade","Upgrade",jobGate(p,"upgrade"))}${qb("jobOptimize","Optimize",jobGate(p,"optimize"))}${qb("backup","Backup","")}${qb("rollback","Rollback",p.backup?"":"No backup yet")}</div>`}`
+    :progressHTML(p,p,`${RAR[p.rarity]} ${p.category}${p.tags.length?" · "+p.tags.join(", "):""} · base ${fmtHrs(p.baseHours)}`)}
+    <div class="small dim" style="margin-top:6px">${p.deployedOn?`Live since ${esc(fmtDate(p.deployedOn))}`:`Started ${esc(fmtDate(p.started))}`} · ${fmtHrs(p.hoursLogged)} logged · Expertise ${EXP_TITLES[expertiseRank(S.codex[p.cardId]?.expertiseHours||0)]}</div></div>`;
+}
+VIEWS.projects=()=>{
+  const building=S.projects.filter(p=>p.status==="coding"||p.status==="testing");
+  const deployed=S.projects.filter(p=>p.status==="live"||p.status==="offline");
+  const vb=versionBonus();
+  return `<div class="panel"><div class="hd"><h2>Projects</h2><button class="btn gold small" data-act="newProject">+ Start a project</button></div>
+    <div class="small muted">${deployed.length} deployed · ${building.length} in progress · version bonus +${pct(vb.value)}${vb.raw>vb.cap?" (capped)":""}</div></div>
+  ${building.length?`<h3 class="sect">In progress</h3><div class="grid">${building.map(projectCardHTML).join("")}</div>`:""}
+  ${deployed.length?`<h3 class="sect">Deployed</h3><div class="grid">${deployed.map(projectCardHTML).join("")}</div>`:`<div class="panel"><div class="empty">Nothing deployed yet. The Runtime is a quiet starfield, waiting for its first constellation.</div></div>`}
+  <div class="panel"><h3>Cards ready to build</h3>${heldCardsHTML()}</div>`};
+
+/* ---- constellations: one per deployed project, drawn from its id ---- */
+function constellationsSVG(){
+  const ps=S.projects.filter(p=>p.status==="live"||p.status==="offline");if(!ps.length)return "";
+  const cols=Math.min(3,ps.length),W=330,cw=W/cols,ch=120,rows=Math.ceil(ps.length/cols),H=rows*ch;
+  let g="";
+  ps.forEach((p,i)=>{const r=mulberry32(hashStr(p.id)%4294967296),cx=(i%cols)*cw+cw/2,cy=Math.floor(i/cols)*ch+52;
+    const n=3+Math.min(5,Math.round(Math.log2(1+p.baseHours))),pts=[];
+    for(let k=0;k<n;k++){const a=r()*Math.PI*2,d=10+r()*Math.min(38,cw/2-12);pts.push([cx+Math.cos(a)*d,cy+Math.sin(a)*d*.7])}
+    pts.sort((a,b)=>a[0]-b[0]);const off=p.status==="offline",dim=off?.25:.45+.55*(p.integrity/p.maxIntegrity);
+    g+=`<g opacity="${dim.toFixed(2)}"><polyline points="${pts.map(q=>q.map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="#d9b25a" stroke-width=".8" opacity=".55"/>${pts.map((q,k)=>`<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="${k===0?2.6:1.6+p.version*.2}" fill="${k===0?"#f1d48c":"#d9b25a"}"/>`).join("")}
+      ${p.bugsKnown?pts.slice(1,1+Math.min(3,p.bugsKnown)).map(q=>`<circle cx="${(q[0]+4).toFixed(1)}" cy="${(q[1]+3).toFixed(1)}" r="1.6" fill="#7a5d1a"/>`).join(""):""}
+      <text x="${cx}" y="${cy+52}" text-anchor="middle" font-size="9" fill="#ebe6d6" font-family="Georgia,serif">${esc(p.name.length>22?p.name.slice(0,21)+"…":p.name)}</text><text x="${cx}" y="${cy+63}" text-anchor="middle" font-size="7.5" fill="#97a0b6" font-family="monospace">${off?"OFFLINE":`V${p.version} · ${Math.round(p.integrity)}%`}</text></g>`});
+  return `<svg viewBox="0 0 ${W} ${H}" class="consts" role="img" aria-label="Deployed projects as constellations">${g}</svg>`;
+}
 
 VIEWS.emerson=()=>{
   const e=S.emerson,need=xpToNext(e.level),g=nextMoarGate(),dr=DAKKA_FLESH.findIndex(f=>e.stats.flesh<f);
@@ -688,7 +913,9 @@ VIEWS.emerson=()=>{
   ${e.levelHistory.length?`<div class="panel" style="margin-top:12px"><h3>Level history</h3><table>${[...e.levelHistory].reverse().map(h=>`<tr><td>Level ${h.level}</td><td class="n">${esc(fmtDate(h.date))} · ${fmtTime(h.time)}</td></tr>`).join("")}</table></div>`:""}`};
 
 VIEWS.runtime=()=>{const max=S.runtime.maxCapacity,safe=safeCapacity(),used=usedCapacity();
-  return `<div class="grid">
+  const cs=constellationsSVG();
+  return `<div class="panel sky"><div class="hd"><h2>The Akh Runtime</h2><span class="small muted">One constellation per deployed project</span></div>${cs||`<div class="empty">A quiet starfield. Deploy a project and its constellation appears here.</div>`}</div>
+  <div class="grid" style="margin-top:12px">
   <div class="panel"><div class="hd"><h2>Capacity</h2><span class="pill">${used} / ${safe} safe · ${max} max</span></div>
     <div class="gauge"><i class="safe" style="width:${safe/max*100}%"></i><i class="act" style="width:${used/max*100}%"></i></div>
     <div class="legend"><span>active ${used}</span><span>safe ${safe}</span><span>max ${max}</span></div>
@@ -876,7 +1103,32 @@ function modalHTML(){
     ${edit}
     <div class="btns">${x?`<button class="btn" data-act="buyCard" data-id="${esc(c.id)}" ${S.shards>=price?"":"disabled"}>Buy a copy · ◈ ${price}</button>`:""}${held?`<button class="btn danger" data-act="dissolve" data-id="${esc(c.id)}" ${dis.ok?"":"disabled title=\""+esc(dis.why)+"\""}>Dissolve 1 · +◈ ${CS().dissolveValue[c.rarity]}</button>`:""}</div>
     ${held&&!dis.ok?`<div class="small muted">${esc(dis.why)}</div>`:""}
-    <div class="small muted" style="margin-top:8px">Building it arrives in milestone 4 (Projects).</div></div></div>`}
+    ${held&&!startGate(c)?`<div class="btns"><button class="btn gold" data-act="newProject" data-id="${esc(c.id)}">Start a project with it</button></div>`:""}</div></div>`}
+  if(m.type==="newProject"){const ids=Object.keys(S.cards).filter(k=>S.cards[k]>0&&getCard(k)&&!getCard(k).unnamed);const sel=m.card&&S.cards[m.card]>0?m.card:null;const card=sel?getCard(sel):null;
+    const tags=m.tags||[];const pl=card?planFor(card,tags):null;const gate=card?startGate(card):null;
+    return `<div class="mback" data-act="closeModal"><div class="mbox" role="dialog" aria-label="Start a project"><div class="hd"><h2>Start a project</h2><button class="btn small" data-act="closeModal">Cancel</button></div>
+    <div class="small muted" style="margin-bottom:6px">The card is reserved, not used up, until it deploys. Abandoning gives it back.</div>
+    ${ids.length?`<div class="picklist">${ids.map(k=>{const c=getCard(k);return `<button class="pick ${k===sel?"on":""}" data-act="npPick" data-id="${esc(k)}"><span class="r-${c.rarity}">●</span> ${esc(c.name)}${S.cards[k]>1?` <span class="dim">×${S.cards[k]}</span>`:""}<span class="small dim"> · ${PACKNAME[c.pack]}</span></button>`}).join("")}</div>`:`<div class="empty">No cards in hand.</div>`}
+    ${card?`<div class="panel" style="margin-top:10px;padding:10px"><h3>${esc(card.name)}${card.repeatable?` · rank ${ROMAN[pl.rank]||pl.rank}`:""}</h3>
+      <label class="f">Release tags</label><div class="row" style="gap:6px">${TAGS.map(t=>`<button class="pill ${tags.includes(t)?"on":""}" data-act="npTag" data-t="${t}" style="cursor:pointer;background:none">${t}</button>`).join("")}</div>
+      <dl class="kv" style="margin-top:10px"><dt>Base coding</dt><dd>${fmtHrs(pl.base)}</dd>${pl.red.parts.map(([n,v])=>`<dt>${esc(n)}</dt><dd>−${pct(v)}</dd>`).join("")}${pl.red.raw>pl.red.total?`<dt>Cap</dt><dd>−${pct(pl.red.total)}</dd>`:""}
+      <dt>Coding</dt><dd class="gold">${fmtHrs(pl.code)}</dd><dt>Testing (never reduced)</dt><dd>${fmtHrs(pl.test)}</dd><dt>Deploy XP</dt><dd>${fmtN(DS().deployXpPerHour*pl.base)}</dd></dl>
+      ${gate?`<div class="note"><b>Can't start yet.</b> <span class="small">${esc(gate)}</span></div>`:""}
+      <div class="btns"><button class="btn gold" data-act="npStart" ${gate?"disabled":""}>Start</button></div></div>`:""}</div></div>`}
+  if(m.type==="job"){const p=S.projects.find(x=>x.id===m.p);if(!p)return "";const k=m.kind;const has=S.cards[p.cardId]>0;
+    const a=jobPlan(p,k,false),b=jobPlan(p,k,true),one=k==="upgrade"||k==="optimize";
+    const row=(pl,dup)=>`<button class="catbtn" data-act="jobGo" data-dup="${dup?1:0}" ${dup&&!has?"disabled":""}><b>${dup?"With a duplicate":"By hand"}</b><span class="small">${fmtHrs(pl.code)} coding + ${fmtHrs(pl.test)} testing${dup?` · uses 1 ${esc(cardName(p.cardId))} (${has?S.cards[p.cardId]+" in hand":"none in hand"})`:""}</span></button>`;
+    return `<div class="mback" data-act="closeModal"><div class="mbox" role="dialog" aria-label="${JOBNAME[k]}"><div class="hd"><h2>${JOBNAME[k]} · ${esc(p.name)}</h2><button class="btn small" data-act="closeModal">Cancel</button></div>
+    <div class="small muted">${k==="upgrade"?`V${p.version} → V${p.version+1}. Needs a duplicate, reserved now and used at deploy. Coding = base × ${p.version+1}/2. Back up first: Rollback is the only undo. The live version keeps running.`:
+      k==="optimize"?`Raises the version cap from V${p.versionCap} to V${p.versionCap+DS().optimizeAdd}. No card; 2× base coding.`:
+      k==="repair"?`Integrity ${Math.round(p.integrity)}/${p.maxIntegrity}. Manual = coding time × the fraction lost; a duplicate cuts it to 25%. The project keeps running. Repairs don't close the hole that caused the damage.`:
+      `Offline at 0%. Redeploy = 50% of coding time, no new card; a duplicate cuts that to 25%.`}</div>
+    ${one?row(a,k==="upgrade"):row(a,false)+row(b,true)}</div></div>`}
+  if(m.type==="release"){const p=S.projects.find(x=>x.id===m.p);if(!p)return "";
+    return `<div class="mback"><div class="mbox" role="dialog" aria-label="Release"><div class="hd"><h2>Release ${esc(p.name)} as…</h2></div>
+    <div class="small muted">Releases drive signups once subscribers are simulated (milestone 7). Recorded now either way.</div>
+    ${[["quiet","Quiet deploy","No announcement"],["cosmetic","Cosmetic drop","×1.1 signups · 7 days"],["content","Content update","×1.25 signups · 14 days · resets drought"],["event","Event","×1.5 signups · for the event's length"],["expansion","Expansion","×2.5 signups · 30 days, fading over 30 more"]].map(([k,l,d])=>`<button class="catbtn" data-act="release" data-rel="${k}"><b>${l}</b><span class="small muted">${d}</span></button>`).join("")}
+    <label class="f">Event length (days, events only)</label><input id="relDays" type="number" min="1" step="1" value="7"></div></div>`}
   if(m.type==="maker"){const c=m.id?S.customCards.find(x=>x.id===m.id):null,f=UI.mk;
     const pk=f.pack,opt=(v,l,cur)=>`<option value="${esc(v)}" ${v===cur?"selected":""}>${esc(l)}</option>`;
     const parents=pk==="Class"?allCards().filter(x=>x.category==="Class"&&x.id!==m.id):pk==="System"?allCards().filter(x=>(x.core||x.pack==="System")&&x.id!==m.id):[];
@@ -957,6 +1209,23 @@ document.addEventListener("click",async ev=>{
     case "xpGo":{const n=Math.round(parseFloat($("#xpAmt").value));if(!(n>0)){toast("Enter a positive amount");return}const why=$("#xpWhy").value.trim()||"Story";UI.modal=null;gainXP(n,why,"Story");commit();render();if(!UI.modal)toast(`+${n} XP`);break}
     case "spend":{const k=a.dataset.stat;if(!confirm(`Spend 1 point on ${STATINFO[k].name}? This is permanent.`))return;if(spendPoint(k)){commit();render();toast(`${STATINFO[k].name} ${S.emerson.stats[k]}`)}break}
     case "toEmerson":UI.modal=null;go("emerson");break;
+    case "newProject":UI.modal={type:"newProject",card:a.dataset.id||null,tags:[]};if(UI.tab!=="projects")go("projects");else render();break;
+    case "npPick":UI.modal.card=a.dataset.id;render();break;
+    case "npTag":{const tg=UI.modal.tags,x=a.dataset.t;UI.modal.tags=tg.includes(x)?tg.filter(y=>y!==x):[...tg,x];render();break}
+    case "npStart":{const p=startProject(UI.modal.card,UI.modal.tags);if(p){commit();UI.modal=null;render();toast(`Started ${p.name}`)}break}
+    case "work":{const p=S.projects.find(x=>x.id===a.dataset.p);if(!p)return;if(work(p,a.dataset.k,+a.dataset.h)){commit();render()}break}
+    case "deploy":{const p=S.projects.find(x=>x.id===a.dataset.p);if(!p||!deploy(p))return;commit();UI.modal={type:"release",p:p.id};render();break}
+    case "release":{const p=S.projects.find(x=>x.id===UI.modal.p);const k=a.dataset.rel;const days=Math.max(1,parseInt($("#relDays")?.value)||7);
+      if(k!=="quiet"){const r={date:S.date,type:k,projectIds:[p.id],days:k==="event"?days:null};S.releases.push(r);p.releases.push(k);if(k==="content"||k==="event"||k==="expansion")S.lastContentDate=S.date}
+      log(k==="quiet"?`${p.name} went live quietly.`:`Released ${p.name} as ${{cosmetic:"a cosmetic drop",content:"a content update",event:`an event (${days} days)`,expansion:"an expansion"}[k]}.`,"Development");
+      commit();UI.modal=null;render();break}
+    case "finishJob":{const p=S.projects.find(x=>x.id===a.dataset.p);if(p&&finishJob(p)){commit();render()}break}
+    case "abandon":{const p=S.projects.find(x=>x.id===a.dataset.p);if(!p)return;if(!confirm(p.job?`Stop the ${JOBNAME[p.job.kind]} on ${p.name}? Progress on it is lost.`:`Abandon ${p.name}? The card goes back to her hand; Expertise from the hours spent is kept.`))return;abandon(p);commit();render();break}
+    case "debug":{const p=S.projects.find(x=>x.id===a.dataset.p);if(p&&debugOne(p)){commit();render()}break}
+    case "jobRepair":case "jobRedeploy":case "jobUpgrade":case "jobOptimize":{const p=S.projects.find(x=>x.id===a.dataset.p);const k={jobRepair:"repair",jobRedeploy:"redeploy",jobUpgrade:"upgrade",jobOptimize:"optimize"}[act];const g=jobGate(p,k);if(g){toast(g,3500);return}UI.modal={type:"job",p:p.id,kind:k};render();break}
+    case "jobGo":{const p=S.projects.find(x=>x.id===UI.modal.p);if(p&&startJob(p,UI.modal.kind,a.dataset.dup==="1")){commit();UI.modal=null;render()}break}
+    case "backup":{const p=S.projects.find(x=>x.id===a.dataset.p);if(p&&(!p.backup||confirm(`Overwrite the backup from ${fmtDate(p.backup.savedOn)} (V${p.backup.version})?`))&&backup(p)){commit();render();toast("Backed up")}break}
+    case "rollback":{const p=S.projects.find(x=>x.id===a.dataset.p);if(!p||!p.backup)return;if(!confirm(`Roll ${p.name} back to V${p.backup.version} from ${fmtDate(p.backup.savedOn)}? Takes 1 hr. Integrity isn't restored.`))return;if(rollback(p)){commit();render()}break}
     case "openPack":{const i=+a.dataset.i,pk=S.packs[i];if(!pk)return;UI.modal={type:"pick",i};render();break}
     case "openCat":{const res=openPack(UI.modal.i,a.dataset.cat);if(!res)return;commit();UI.modal={type:"reveal",res};render();break}
     case "buyPack":if(buyPack()){commit();toast("Pack added");render()}break;
@@ -1051,7 +1320,7 @@ let skyT;addEventListener("resize",()=>{clearTimeout(skyT);skyT=setTimeout(drawS
   drawSky();
   const db=lsGet(LS.db,null);setCards(db&&db.cards?db.cards:DEFAULT_CARDS);
   const local=lsGet(LS.save,null);
-  if(local)S=migrate(local);else UI.tab="projects";
+  if(local){S=migrate(local);recomputeRuntime()}else UI.tab="projects";
   render();
   if(GH.ready()){
     syncState="busy";syncMsg="Syncing…";renderStatus();
